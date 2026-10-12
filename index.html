@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소화계의 구조와 기능 가상실험실</title>
+<style>
+:root{
+  --primary:#0b7285; --primary-dark:#095c6b; --primary-soft:#e3f4f7;
+  --accent:#f08c00; --bg:#f4f8f7; --surface:#fff; --text:#1c2a2e; --text-light:#55656b;
+  --ok:#1e8e5a; --err:#d9480f; --line:#d9e4e6;
+  --carb:#f08c00; --prot:#d6336c; --fat:#8f6b00; --min:#5f3dc4; --vit:#2f9e44; --wat:#1c7ed6;
+  --radius:18px; --shadow:0 8px 24px rgba(20,50,60,.08);
+  --font:'Noto Sans KR',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px}
+button{font-family:var(--font);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#app{max-width:980px;margin:0 auto;padding:16px 16px 70px}
+h1{font-size:clamp(24px,4.4vw,32px);margin:0 0 8px}
+h2{font-size:clamp(20px,3.4vw,25px);margin:0 0 12px}
+h3{font-size:18px;margin:0 0 8px}
+p{line-height:1.65;color:var(--text-light);margin:0 0 10px}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+.btn{border:none;border-radius:14px;padding:12px 22px;font-size:17px;font-weight:700;color:#fff;background:var(--primary);min-height:52px}
+.btn:active{background:var(--primary-dark)}
+.btn.secondary{background:#fff;color:var(--primary);border:2px solid var(--primary)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{font-weight:800;font-size:18px;color:var(--primary)}
+.steps{display:flex;gap:6px;flex:1;min-width:280px}
+.step{flex:1;text-align:center;font-size:13px;font-weight:700;padding:8px 2px;border-radius:10px;background:#dfeaec;color:var(--text-light);border:none;min-height:44px}
+.step.done{background:#bfe3e9;color:var(--primary-dark)}
+.step.active{background:var(--primary);color:#fff}
+.screen{display:none}.screen.active{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.badge{display:inline-block;background:var(--primary-soft);color:var(--primary-dark);font-weight:700;font-size:14px;padding:6px 12px;border-radius:20px;margin:0 6px 6px 0}
+.hero{text-align:center;padding:26px 14px}
+.hero .big{font-size:56px}
+.goal-list{list-style:none;padding:0;margin:14px auto;max-width:560px;text-align:left}
+.goal-list li{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);line-height:1.5}
+.flow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:14px 0;font-size:14px;color:var(--text-light)}
+.flow span{background:#fff;border-radius:20px;padding:6px 12px;box-shadow:var(--shadow)}
+.core{background:linear-gradient(135deg,#0b7285,#1098ad);color:#fff;border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.core b{font-size:15px;opacity:.9}.core p{color:#fff;font-size:18px;font-weight:700;margin:6px 0 0;line-height:1.55}
+details{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:16px 18px;font-weight:800;font-size:17px;min-height:56px;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'▾';margin-left:auto;color:var(--primary);transition:transform .2s}
+details[open] summary::after{transform:rotate(180deg)}
+.dbody{padding:0 18px 18px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border:1px solid var(--line);padding:8px 8px;text-align:center;line-height:1.4}
+th{background:var(--primary-soft);color:var(--primary-dark)}
+.tblwrap{overflow-x:auto}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.mini{border-radius:14px;padding:12px 14px;border:2px solid var(--line);background:#fff}
+.mini h4{margin:0 0 4px;font-size:16px}.mini p{font-size:14px;margin:0}
+.mis{display:grid;gap:8px;margin-bottom:10px}
+.mis div{border-radius:12px;padding:10px 14px;font-size:15px;line-height:1.5}
+.mis .x{background:#fff0e8;border-left:5px solid var(--err);color:#7a2c0a}
+.mis .o{background:#e8f8ef;border-left:5px solid var(--ok);color:#125c38}
+.tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.tab{border:2px solid var(--primary);background:#fff;color:var(--primary);border-radius:14px;padding:10px 16px;font-weight:800;font-size:16px;min-height:52px}
+.tab.active{background:var(--primary);color:#fff}
+.pane{display:none}.pane.active{display:block}
+textarea,input[type=text]{width:100%;border:2px solid var(--line);border-radius:12px;padding:10px;font-family:var(--font);font-size:16px}
+textarea{min-height:76px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:14px;padding:8px 14px;font-size:16px;font-weight:700;min-height:52px;color:var(--text)}
+.chip.sel{border-color:var(--primary);background:var(--primary-soft);color:var(--primary-dark)}
+.chip small{display:block;font-weight:500;font-size:12px;color:var(--text-light)}
+.lab{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:16px;align-items:start}
+@media(max-width:700px){.lab{grid-template-columns:1fr}}
+.tubebox{background:linear-gradient(#f3fafb,#e2eff1);border-radius:16px;padding:6px;text-align:center}
+.tubebox svg{width:100%;max-width:280px;height:auto}
+.liq{transition:fill 1.1s ease}
+.liq.slow{transition:fill 2.4s ease}
+.bub{animation:rise 1.1s linear infinite}
+@keyframes rise{from{transform:translateY(0);opacity:.9}to{transform:translateY(-70px);opacity:0}}
+.result{background:var(--primary-soft);border-radius:14px;padding:12px 14px;min-height:64px;font-size:16px;line-height:1.55;margin-top:8px}
+.rtable td.pos{font-weight:800}
+.sw{display:inline-block;width:16px;height:16px;border-radius:50%;border:1px solid #0004;vertical-align:-3px;margin-right:4px}
+.note{font-size:14px;color:var(--text-light);background:#fff8e1;border-radius:10px;padding:8px 12px;margin:8px 0}
+.foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.food{border:2px solid var(--line);background:#fff;border-radius:14px;padding:8px;min-height:64px;font-size:15px;font-weight:700;color:var(--text)}
+.food span{display:block;font-size:24px}
+.plate{display:flex;flex-wrap:wrap;gap:8px;min-height:64px;background:#fdfdfb;border:3px dashed #b8c9cc;border-radius:50px;padding:10px 16px;align-items:center;justify-content:center}
+.pitem{border:none;background:var(--primary-soft);border-radius:14px;padding:8px 12px;font-weight:700;font-size:15px;min-height:48px}
+.bar{display:flex;height:34px;border-radius:10px;overflow:hidden;background:#e5eeef;position:relative}
+.bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;transition:width .4s}
+.six{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+.six div{border-radius:12px;padding:8px;text-align:center;font-weight:700;font-size:15px;border:2px solid var(--line);background:#fff}
+.six div.on{border-color:var(--ok);background:#e8f8ef;color:#125c38}
+.status{display:grid;gap:6px;margin:8px 0}
+.status div{padding:8px 12px;border-radius:10px;background:#f1f6f6;font-size:15px}
+.status .good{background:#e8f8ef}.status .warn{background:#fff3e0}
+/* sticker */
+.stkstat{font-weight:800;color:var(--primary-dark);margin-bottom:8px}
+.sboard th.h{width:22%}
+.slot{min-height:56px;min-width:100px;border:2px dashed #aebfc3;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:4px;position:relative;background:#fbfdfd;cursor:pointer}
+.slot.ready{border-color:var(--primary);background:var(--primary-soft)}
+.slot.ok{border:2px solid var(--ok);background:#e8f8ef}.slot.ok::after{content:'✔';position:absolute;top:-10px;right:-8px;background:#fff;border-radius:50%;color:var(--ok);font-weight:900;padding:0 3px}
+.slot.no{border:2px solid var(--err);background:#fff0e8}.slot.no::after{content:'✖';position:absolute;top:-10px;right:-8px;background:#fff;border-radius:50%;color:var(--err);font-weight:900;padding:0 3px}
+.slot .hint{font-size:13px;color:var(--text-light);line-height:1.3}
+.stktray{display:flex;flex-wrap:wrap;gap:12px;min-height:76px;padding:6px}
+.sticker{border:none;border-radius:12px;padding:10px 14px;font-size:16px;font-weight:800;min-height:52px;background:#fff3bf;color:#4a3b00;box-shadow:0 3px 0 rgba(0,0,0,.14);transform:rotate(var(--tilt,0deg));transition:transform .15s,box-shadow .15s}
+.sticker.r{background:#d3f0f5;color:#08505e}.sticker.c{background:#ffe8cc;color:#6b3a00}.sticker.t{background:#ececec;color:#333}
+.sticker.picked{transform:scale(1.1);box-shadow:0 8px 18px rgba(0,0,0,.25);outline:3px solid var(--primary)}
+.slot .sticker{min-height:44px;padding:6px 10px;font-size:15px;transform:none}
+.stamp{display:none;text-align:center;font-size:28px;font-weight:900;color:var(--ok);border:4px solid var(--ok);border-radius:14px;padding:8px 18px;transform:rotate(-4deg);margin:10px auto;width:fit-content}
+.stamp.show{display:block;animation:pop .5s}
+@keyframes pop{from{transform:scale(2) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(-4deg);opacity:1}}
+.life{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.life .card{margin:0}.life .link{font-size:14px;font-weight:700;color:var(--primary-dark);background:var(--primary-soft);border-radius:8px;padding:6px 10px;display:block;margin-top:8px}
+.prog{height:8px;border-radius:4px;background:#dfeaec;overflow:hidden;margin-bottom:14px}.prog div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.choice{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:10px;font-size:17px;min-height:54px;color:var(--text)}
+.choice.correct{border-color:var(--ok);background:#e8f8ef}.choice.wrong{border-color:var(--err);background:#fff0e8}
+.expl{display:none;background:var(--primary-soft);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.55}.expl.show{display:block}
+.score{font-size:52px;font-weight:900;color:var(--primary)}
+.check label{display:flex;gap:10px;align-items:center;padding:10px 4px;font-size:16px;min-height:48px}
+.check input{width:24px;height:24px}
+footer{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:12px;color:var(--text-light);padding:8px 0;background:linear-gradient(to top,var(--bg) 65%,transparent);pointer-events:none}
+/* ===== 소화계 추가 ===== */
+:root{--starch:#6741d9;--prot:#d6336c;--fat:#e8890c;--juice:#0b7285;--abs:#e64980}
+.n-starch{color:var(--starch);font-weight:800}.n-prot{color:var(--prot);font-weight:800}.n-fat{color:#b36200;font-weight:800}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.two{grid-template-columns:1fr}}
+.dsbox{position:relative;width:100%;max-width:660px;margin:0 auto;padding-bottom:min(93.3%,620px);background:linear-gradient(#f7fbfb,#eaf3f4);border-radius:16px;overflow:hidden}
+.dsbox>svg{position:absolute;inset:0;width:100%;height:100%}
+.dsbox .slot,.dsbox .olabel{position:absolute;width:23%;height:11.2%;min-width:0;min-height:44px}
+.olabel{border:2px solid var(--primary);background:#fff;border-radius:12px;font-weight:800;font-size:clamp(12px,2.6vw,16px);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;padding:2px}
+.olabel.on{background:var(--primary);color:#fff}
+.organ{cursor:pointer;transition:filter .2s}.organ:hover,.organ.on{filter:brightness(1.12) drop-shadow(0 0 4px #0b7285)}
+.tip{background:var(--primary-soft);border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.6;margin-top:10px;min-height:56px}
+.membox{background:#f3fafb;border-radius:16px;padding:6px;position:relative}
+.membox svg{width:100%;max-width:560px;height:auto;display:block;margin:0 auto}
+.ptc{transition:transform .9s ease-in-out}
+.sol{background:#fff;border-radius:14px;padding:10px 14px;border:2px solid var(--line);margin:8px 0}
+.qc{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.qc .qopt{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 14px;margin:6px 0;font-size:16px;min-height:48px;color:var(--text)}
+.qc .qopt.correct{border-color:var(--ok);background:#e8f8ef}.qc .qopt.wrong{border-color:var(--err);background:#fff0e8}
+.qc .fb{display:none;font-size:15px;line-height:1.55;background:var(--primary-soft);padding:8px 12px;border-radius:10px;margin-top:6px}.qc .fb.show{display:block}
+.lock{background:#fff8e1;border:2px dashed #f0b429;border-radius:14px;padding:16px;text-align:center}
+.safe label{display:flex;gap:10px;align-items:center;padding:8px 2px;min-height:48px;font-size:16px}.safe input{width:24px;height:24px}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.plist label{display:flex;gap:6px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:10px;padding:6px 8px;font-size:14px;min-height:44px}
+.plist label.on{border-color:var(--ok);background:#e8f8ef}.plist input{width:20px;height:20px}
+.acts{display:grid;grid-template-columns:1fr;gap:8px}
+.act{border:2px solid var(--primary);background:#fff;color:var(--primary-dark);border-radius:12px;padding:10px 14px;font-size:15px;font-weight:700;text-align:left;min-height:52px;display:flex;gap:8px;align-items:center}
+.act.done{background:#e8f8ef;border-color:var(--ok);color:#125c38}.act.done::after{content:'✔';margin-left:auto;font-weight:900}
+.act:active{transform:scale(.99)}
+.labsvg{background:linear-gradient(#f3fafb,#e2eff1);border-radius:16px;padding:6px;text-align:center}.labsvg svg{width:100%;max-width:380px;height:auto}
+.timer{height:14px;background:#dfeaec;border-radius:8px;overflow:hidden;margin:6px 0}.timer div{height:100%;width:0;background:var(--primary)}
+.msg{background:#fff8e1;border-left:5px solid #f0b429;border-radius:10px;padding:10px 14px;font-size:15px;line-height:1.5;margin:8px 0;min-height:44px}
+.msg.good{background:#e8f8ef;border-color:var(--ok)}.msg.bad{background:#fff0e8;border-color:var(--err)}
+select{font-family:var(--font);font-size:15px;border:2px solid var(--line);border-radius:10px;padding:8px;min-height:44px;width:100%;background:#fff}
+.badge.ext{background:#fff3bf;color:#7a5a00}.badge.sup{background:#ece3ff;color:#4b2fa8}
+.stage{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.stage .sg{flex:1;min-width:64px;text-align:center;padding:8px 4px;border-radius:12px;background:#dfeaec;font-weight:800;font-size:14px;color:var(--text-light)}
+.stage .sg.cur{background:var(--primary);color:#fff}.stage .sg.past{background:#bfe3e9;color:var(--primary-dark)}
+.mol{background:#fff;border:2px solid var(--line);border-radius:14px;padding:6px;text-align:center}.mol svg{width:100%;height:auto;max-height:190px}
+.mol h4{margin:2px 0 4px;font-size:14px;color:var(--text-light)}
+.pbar{height:26px;background:#e5eeef;border-radius:13px;overflow:hidden;position:relative}.pbar div{height:100%;background:var(--ok);transition:width .6s;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;min-width:0}
+.hbar{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:14px}.hbar span.l{width:64px;font-weight:700}.hbar .t{flex:1;height:22px;background:#e5eeef;border-radius:8px;overflow:hidden}.hbar .t div{height:100%;transition:width .7s}
+.chk{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:4px 0}.chk label{display:flex;gap:4px;align-items:center;background:#fff;border:2px solid var(--line);border-radius:10px;padding:6px 10px;min-height:44px}.chk input{width:20px;height:20px}
+.range{width:100%;height:36px}
+input[type=range]{accent-color:var(--primary)}
+.dish{border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px;min-height:76px;font-size:15px;font-weight:700;color:var(--text);text-align:center}
+.dish.sel{border-color:var(--primary);background:var(--primary-soft)}.dish.ok{border-color:var(--ok);background:#e8f8ef}
+.dish span{display:block;font-size:28px}.dish small{display:block;font-weight:500;font-size:12px;color:var(--text-light)}
+.stkround{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}.stkround button{flex:1;min-width:110px}
+.flowrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}.flowrow .slot{flex:1;min-width:92px;max-width:150px}.flowrow .ar{font-size:22px;color:var(--primary)}
+.sticker.o{background:#e3f4f7;color:#08505e}.sticker.e{background:#ece3ff;color:#4b2fa8}.sticker.p{background:#ffdeeb;color:#8a1c43}.sticker.f{background:#ffe8cc;color:#7a3e00}.sticker.g{background:#d3f9d8;color:#1b5e20}
+.sticker{max-width:100%;text-align:center}
+.slot .sticker{font-size:clamp(11px,2.4vw,15px);padding:4px 6px;min-height:40px}
+.sboard3 td{padding:4px}
+@media print{footer{display:none}}
+.sboard3 .slot{min-width:0;min-height:52px}.sboard3 table{table-layout:fixed;width:100%}.sboard3 th{font-size:13px;padding:4px 2px}
+.sboard3 td{padding:3px}.sboard3 .slot .sticker{padding:4px 2px;font-size:clamp(10px,2.8vw,15px);overflow-wrap:anywhere;line-height:1.2}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="topbar"><div class="brand">🔬 소화계 가상실험실</div><div class="steps" id="steps"></div></div>
+
+<!-- 1. 도입 -->
+<section class="screen active" id="screen-intro">
+  <div class="card hero">
+    <div class="big">🍙👄🧪</div>
+    <h1>먹은 음식은 우리 몸속에서 어떻게 변할까?</h1>
+    <p>Ⅵ. 동물과 에너지 · 1. 소화와 순환 · 2. 소화계의 구조와 기능</p>
+    <div><span class="badge">중학교 2학년 과학</span><span class="badge">미래엔 교과서 206~211쪽</span><span class="badge">교사용 지도서 340~345쪽</span><span class="badge">[9과13-01]</span></div>
+    <ul class="goal-list">
+      <li>🎯 소화가 필요한 까닭을 영양소의 크기와 세포막 통과로 설명할 수 있다.</li>
+      <li>🎯 소화계를 이루는 기관의 이름과 기능을 설명할 수 있다.</li>
+      <li>🎯 침의 소화 작용을 실험 결과로 추론할 수 있다.</li>
+      <li>🎯 녹말·단백질·지방이 소화효소의 작용으로 소화되는 과정을 기관별로 설명할 수 있다.</li>
+      <li>🎯 작은창자 안쪽 벽의 구조(주름·융털)와 영양소 흡수의 관계를 설명할 수 있다.</li>
+    </ul>
+    <div class="flow"><span>1 도입</span>➜<span>2 개념</span>➜<span>3 탐구</span>➜<span>4 스티커</span>➜<span>5 실생활</span>➜<span>6 확인</span></div>
+    <div class="note" style="max-width:560px;margin:10px auto;text-align:left">📌 <b>수업 차시 안내</b><br>3차시: 개념 ①~③ · 침의 소화 작용 탐구 · 스티커 판1<br>4~5차시: 개념 ④~⑥ · 소화 여행 · 융털 · 스티커 판2·3 · 천연 소화제 식단</div>
+    <div class="btn-row" style="justify-content:center"><button class="btn" id="startBtn" onclick="goTo(1)">시작하기 ▶</button><button class="btn secondary" id="resumeBtn" style="display:none" onclick="resume()">이어서 하기</button></div>
+  </div>
+</section>
+
+<!-- 2. 개념 -->
+<section class="screen" id="screen-concept">
+  <div class="core"><b>💡 핵심 아이디어</b><p>음식물 속 큰 영양소는 세포막을 통과할 수 없어서, 소화계가 소화효소의 도움으로 작게 쪼개(분해해) 준 뒤에야 작은창자에서 흡수되어 몸속 세포로 갈 수 있다.</p></div>
+  <details open id="c1"><summary>① 왜 소화가 필요할까?</summary><div class="dbody">
+    <p>알갱이를 눌러 세포막을 지나가게 해 보세요. 세포막 구멍보다 크면 통과하지 못해요.</p>
+    <div class="membox"><svg id="memSvg" viewBox="0 0 360 170"></svg></div>
+    <div class="chips" id="memChips" style="margin-top:8px"></div>
+    <div class="tip" id="memTip">알갱이를 골라 눌러 보세요.</div>
+    <p style="margin-top:8px"><b>소화</b>: 크기가 큰 영양소가 세포막을 통과할 수 있는 작은 크기의 영양소로 분해되는 과정이에요.</p>
+  </div></details>
+  <details id="c2"><summary>② 소화계의 구성</summary><div class="dbody">
+    <p>소화계는 입에서 항문까지 이어진 <b>소화관</b>과, 소화액을 만들거나 저장·분비하는 <b>침샘·간·쓸개·이자</b>로 이루어져요. 기관 이름이나 기관 그림을 눌러 보세요.</p>
+    <div class="dsbox" id="dsConcept"></div>
+    <div class="tip" id="organTip">기관을 눌러 기능을 확인해 보세요.</div>
+  </div></details>
+  <details id="c3"><summary>③ 소화효소</summary><div class="dbody">
+    <p>소화효소는 크기가 큰 영양소를 작은 영양소로 분해하는 것을 <b>촉진</b>하는 물질로, 소화액에 들어 있어요. 각 소화효소는 <b>특정 영양소에만</b> 작용해요(열쇠와 자물쇠처럼!).</p>
+    <div class="sol"><b>소화효소를 고르고, 영양소를 골라 맞춰 보세요</b>
+      <div class="chips" id="enzChips" style="margin:6px 0"></div><div class="chips" id="nutChips" style="margin:6px 0"></div>
+      <svg id="keySvg" viewBox="0 0 320 110" style="width:100%;max-width:360px;display:block;margin:0 auto"></svg>
+      <div class="tip" id="keyTip">소화효소와 영양소를 각각 골라 보세요.</div></div>
+    <div class="tblwrap"><table><tr><th>소화효소</th><th>들어 있는 곳</th><th>작용</th></tr>
+    <tr><td>아밀레이스</td><td>침, 이자액</td><td>녹말 → 엿당</td></tr>
+    <tr><td>펩신</td><td>위액</td><td>단백질을 더 작은 크기로 분해</td></tr>
+    <tr><td>트립신</td><td>이자액</td><td>단백질을 더 작은 크기로 분해</td></tr>
+    <tr><td>라이페이스</td><td>이자액</td><td>지방 → 지방산 + 모노글리세라이드</td></tr></table></div>
+    <div class="note">펩신·트립신은 "단백질을 분해한다" 수준으로 알아 두면 돼요.</div>
+  </div></details>
+  <details id="c4"><summary>④ 영양소별 소화 과정</summary><div class="dbody">
+    <div class="tblwrap"><table><tr><th>영양소</th><th>소화되는 기관</th><th>작용하는 소화효소</th><th>최종 분해 산물</th></tr>
+    <tr><td class="n-starch">녹말</td><td>입, 작은창자</td><td>아밀레이스 (침·이자액)</td><td>엿당 → <b>포도당</b></td></tr>
+    <tr><td class="n-prot">단백질</td><td>위, 작은창자</td><td>펩신 (위액), 트립신 (이자액)</td><td><b>아미노산</b></td></tr>
+    <tr><td class="n-fat">지방</td><td>작은창자</td><td>라이페이스 (이자액)</td><td><b>지방산, 모노글리세라이드</b></td></tr></table></div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="mini"><h4>👄 침</h4><p>아밀레이스가 들어 있어요.</p></div>
+      <div class="mini"><h4>🫙 위액</h4><p>소화효소인 <b>펩신</b>과 강한 산성의 <b>염산</b>. 염산은 펩신의 작용을 돕고 음식물 속 세균을 죽여요.</p></div>
+      <div class="mini"><h4>🧴 이자액</h4><p>아밀레이스·트립신·라이페이스가 모두 들어 있어요.</p></div>
+      <div class="mini"><h4>🟢 쓸개즙</h4><p>소화효소는 없지만 지방의 소화가 잘 일어나도록 도와요.</p></div></div>
+  </div></details>
+  <details id="c5"><summary>⑤ 작은창자의 흡수</summary><div class="dbody">
+    <p>작은창자 안쪽 벽에는 <b>주름</b>이 많고, 주름 표면에는 <b>융털</b>이 빽빽해요. 그래서 영양소와 닿는 <b>표면적이 매우 넓어</b> 영양소를 효율적으로 흡수해요. 융털 속에는 <b>모세혈관</b>과 <b>암죽관</b>이 있어요. 흡수된 영양소는 심장을 거쳐 온몸의 조직세포로 운반돼요.</p>
+    <div class="membox"><svg id="villiSvg" viewBox="0 0 360 200"></svg></div>
+    <details><summary style="min-height:48px"><span class="badge sup">보충</span> 영양소의 흡수 경로</summary><div class="dbody"><p>• 물에 잘 녹는 영양소(포도당, 아미노산, 무기염류, 수용성 바이타민)는 융털의 <b>모세혈관</b>으로 흡수돼요.<br>• 물에 잘 녹지 않는 영양소인 지용성 바이타민은 융털의 <b>암죽관</b>으로 흡수돼요.<br>• 지방산과 모노글리세라이드는 융털의 상피세포로 흡수된 뒤 다시 지방으로 합성되어 암죽관으로 들어가요.</p></div></details>
+  </div></details>
+  <details id="c6"><summary>⑥ 큰창자와 배출</summary><div class="dbody">
+    <p>작은창자에서 흡수되지 않고 남은 찌꺼기는 큰창자로 이동해요. 큰창자에서는 <b>소화 작용이 거의 일어나지 않고</b> 주로 <b>물이 흡수</b>돼요. 소화되지 않고 남은 찌꺼기는 대변이 되어 항문을 통해 몸 밖으로 나가요.</p>
+  </div></details>
+
+  <h3 style="margin-top:18px">🧐 오개념 바로잡기</h3>
+  <div id="misWrap"></div>
+  <div class="btn-row"><button class="btn secondary" onclick="goTo(0)">이전</button><button class="btn" onclick="goTo(2)">탐구하러 가기 ▶</button></div>
+</section>
+
+<!-- 3. 탐구 -->
+<section class="screen" id="screen-experiment">
+  <h2>🔬 탐구하기</h2>
+  <div class="tabs">
+    <button class="tab active" data-tab="plan">📝 탐구 계획서</button>
+    <button class="tab" data-tab="saliva">🧪 침의 소화 작용</button>
+    <button class="tab" data-tab="journey">🚶 소화 여행</button>
+    <button class="tab" data-tab="villi">🌿 융털과 표면적</button>
+    <button class="tab" data-tab="diet">🍍 천연 소화제 식단</button>
+  </div>
+
+  <div class="pane active" id="pane-plan">
+    <div class="card"><h3>1. 문제 인식</h3><p>음식물이 입안으로 들어오면 이에 의해 잘게 부서지고, 혀에 의해 음식물과 침이 골고루 섞여요. <b>침은 어떤 소화 작용을 할까요?</b></p></div>
+    <div class="card"><h3>2. 가설 세우기</h3><textarea data-save="hyp" placeholder="예) 침은 녹말을 ○○으로 분해할 것이다. 왜냐하면…"></textarea></div>
+    <div class="card"><h3>3. 변인 통제</h3><div class="tblwrap"><table><tr><th>조작 변인</th><th>통제 변인</th><th>종속 변인</th></tr>
+      <tr><td>침 용액의 유무<br>((가) 증류수 / (나) 침 용액)</td><td>녹말 용액의 양과 농도, 온도(35~40 ℃), 담가 두는 시간(10분)</td><td>아이오딘 반응 색, 베네딕트 반응 색</td></tr></table></div></div>
+    <div class="card"><h3>4. 준비물 <small style="font-weight:400">(챙긴 것은 눌러서 체크)</small></h3><div class="plist" id="prepList"></div></div>
+    <div class="card"><h3>5. 실험 과정</h3><ol style="line-height:1.8;padding-left:22px;margin:0">
+      <li>혀 밑에 거즈를 넣어 침을 충분히 적시고, 이 거즈를 10 mL의 증류수에 헹궈 침 용액을 만든다.</li>
+      <li>시험관 (가)와 (나)에 5 % 녹말 용액을 각각 5 mL씩 넣는다.</li>
+      <li>(가)에는 증류수 5 mL를, (나)에는 침 용액 5 mL를 넣은 후 35~40 ℃의 물에 10분 정도 담가 둔다.</li>
+      <li>받침 유리 2개에 (가)와 (나)의 용액을 1방울씩 떨어뜨리고, 아이오딘-아이오딘화 칼륨 용액을 1방울씩 떨어뜨린 후 색깔 변화를 관찰한다.</li>
+      <li>(가)와 (나)의 남은 용액에 베네딕트 용액을 2~3방울씩 넣고, 뜨거운 물(80~90 ℃)에 담근 후 색깔 변화를 관찰한다.</li></ol></div>
+    <div class="card"><h3>6. 예상 결과</h3><textarea data-save="pred" placeholder="(가)와 (나)에서 아이오딘 반응, 베네딕트 반응의 색깔이 어떻게 될지 예상해 보세요."></textarea></div>
+    <div class="card safe"><h3>🥽 가상 안전 점검 <small style="font-weight:400">(모두 체크하면 실험을 시작할 수 있어요)</small></h3>
+      <label><input type="checkbox" class="sf"> 🥼 실험복, 보안경, 실험용 장갑을 착용했다.</label>
+      <label><input type="checkbox" class="sf"> 🧪 시약이 피부에 닿지 않게 조심하겠다.</label>
+      <label><input type="checkbox" class="sf"> 🔥 뜨거운 물을 다룰 때 화상을 입지 않게 조심하겠다.</label>
+      <label><input type="checkbox" class="sf"> 🧫 유리 기구가 깨지지 않게 조심하고, 침과 관련된 장난을 하지 않겠다.</label>
+      <div class="btn-row"><button class="btn" id="startLab" disabled onclick="openTab('saliva')">🧪 가상실험 시작</button></div></div>
+  </div>
+
+  <div class="pane" id="pane-saliva">
+    <div class="lock" id="salLock"><b>🔒 먼저 탐구 계획서의 안전 점검을 마쳐 주세요.</b><div class="btn-row" style="justify-content:center"><button class="btn secondary" onclick="openTab('plan')">계획서로 가기</button></div></div>
+    <div id="salBody" style="display:none">
+    <div class="lab">
+      <div>
+        <div class="labsvg"><svg id="labSvg" viewBox="0 0 360 350"></svg></div>
+        <div style="margin-top:8px"><b id="timerTxt">⏱ 경과 시간 0.0 / 10분</b><div class="timer"><div id="timerBar"></div></div>
+          <div class="btn-row" style="margin-top:6px"><button class="btn secondary" id="pauseBtn" style="min-height:48px;padding:6px 14px" onclick="togglePause()" disabled>⏸ 멈추기</button>
+          <button class="btn secondary" style="min-height:48px;padding:6px 14px" onclick="toggleMol()">🔬 분자 확대 보기</button></div></div>
+        <div id="molBox" class="sol" style="display:none"></div>
+      </div>
+      <div>
+        <div class="acts" id="acts"></div>
+        <div class="msg" id="salMsg">아래 순서대로 눌러 실험을 진행해 보세요. 순서를 어기면 힌트를 줄게요.</div>
+        <button class="btn secondary" onclick="resetSal()" style="min-height:44px;padding:6px 14px">↺ 실험 처음부터</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>📋 관찰 기록 <small style="font-weight:400;color:var(--text-light)">(관찰한 색깔을 골라 보세요)</small></h3>
+      <div class="tblwrap"><table><tr><th rowspan="2">구분</th><th colspan="2">색깔 변화</th><th rowspan="2">색이 변한 까닭</th></tr><tr><th>(가)</th><th>(나)</th></tr>
+        <tr><th>과정 4<br><small>아이오딘</small></th><td><select data-rec="i_a"></select></td><td><select data-rec="i_b"></select></td><td><textarea data-save="why4" style="min-height:60px" placeholder="까닭을 써 보세요"></textarea></td></tr>
+        <tr><th>과정 5<br><small>베네딕트</small></th><td><select data-rec="b_a"></select></td><td><select data-rec="b_b"></select></td><td><textarea data-save="why5" style="min-height:60px" placeholder="까닭을 써 보세요"></textarea></td></tr></table></div>
+      <div class="btn-row"><button class="btn" onclick="checkRec()">내 기록 확인하기</button></div><div class="msg" id="recMsg" style="display:none"></div></div>
+    <div class="card"><h3>🧠 결론 쓰기</h3><p>실험 결과를 바탕으로 침이 어떤 소화 작용을 하는지 설명해 보세요.</p><textarea data-save="concl" placeholder="(나)에서 ○○이 검출되지 않고 ○○이 검출된 것을 통해…"></textarea>
+      <div class="btn-row"><button class="btn secondary" onclick="$('conclAns').style.display='block'">교과서 정리 보기</button></div>
+      <div class="note" id="conclAns" style="display:none">(가)에서는 녹말이 분해되지 않았고, (나)에서는 침에 의해 녹말이 당분(엿당)으로 분해되었어요. 즉 <b>침은 녹말을 당분(엿당)으로 분해하는 작용</b>을 해요. (10분 뒤에도 (나)에 옅은 색이 약간 남을 수 있어요. 녹말이 완전히 분해되지 않았기 때문이에요.)</div></div>
+    <div id="salQs"></div>
+    <div class="card"><h3>🌡️ 도전 과제 <span class="badge ext">교과서 밖 확장</span></h3>
+      <p>침 용액에서 녹말이 분해되는 속도는 온도에 따라 어떻게 달라질까요? 온도를 골라 겹쳐 보세요. (녹말 잔량 그래프)</p>
+      <div class="chips" id="tempChips"></div>
+      <svg id="tempSvg" viewBox="0 0 360 200" style="width:100%;max-width:520px;background:#fbfdfd;border-radius:12px;margin-top:8px"></svg>
+      <div class="note">37 ℃ 부근에서 가장 빨리 분해되고, 너무 낮거나 높으면 거의 일어나지 않아요. 이 내용은 교과서 범위를 넘는 확장 활동이에요.</div></div>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-journey">
+    <div class="card"><h3>🚶 영양소를 따라 소화 여행</h3><p>영양소를 고른 뒤, 기관마다 <b>어떤 소화효소가 작용할지 먼저 예측</b>하고 확인해 보세요.</p>
+      <div class="chips" id="jNut"></div></div>
+    <div class="card" id="jMain">
+      <div class="stage" id="jStage"></div>
+      <h3 id="jTitle"></h3><p id="jSub"></p>
+      <div class="two"><div class="mol"><h4>도착했을 때</h4><svg id="jBefore" viewBox="0 0 300 150"></svg></div><div class="mol"><h4 id="jAfterH">소화된 뒤</h4><svg id="jAfter" viewBox="0 0 300 150"></svg></div></div>
+      <div style="margin:10px 0"><b style="font-size:14px">세포막을 통과할 수 있는 크기가 된 비율</b><div class="pbar"><div id="jPbar" style="width:0%">0%</div></div></div>
+      <div id="jAsk"></div><div class="msg" id="jMsg" style="display:none"></div>
+      <div class="btn-row"><button class="btn" id="jNext" style="display:none" onclick="jNext()">다음 기관으로 ▶</button><button class="btn secondary" onclick="jReset()">↺ 처음부터</button></div>
+    </div>
+    <div class="card"><h3>📝 정리: 어느 기관에서 소화될까요?</h3><p>소화가 일어나는 기관을 모두 골라 보세요.</p>
+      <div class="tblwrap"><table id="jTbl"></table></div><div class="btn-row"><button class="btn" onclick="jCheckTbl()">확인하기</button></div><div class="msg" id="jTblMsg" style="display:none"></div></div>
+    <div class="card"><h3>📊 세 영양소를 한 번에!</h3><p>세 영양소를 함께 흘려보내며, <b>처음 크기 그대로 남은 영양소(%)</b>가 기관마다 어떻게 줄어드는지 겹쳐 보세요.</p>
+      <div id="allChart"></div><div class="btn-row"><button class="btn" onclick="runAll()">▶ 세 영양소 함께 보내기</button></div></div>
+  </div>
+
+  <div class="pane" id="pane-villi">
+    <div class="card"><h3>🌿 작은창자 안쪽 벽의 단면</h3><p><b>주름 수</b>와 <b>융털</b>을 바꾸고 <b>흡수 시작</b>을 눌러 10초 동안 흡수되는 영양소의 양을 비교해 보세요. (수치는 모두 상댓값이에요.)</p>
+      <div class="membox"><svg id="wallSvg" viewBox="0 0 360 210"></svg></div>
+      <div style="margin-top:8px"><label><b>주름 수: <span id="foldV">0</span>개</b></label><input type="range" class="range" id="foldR" min="0" max="4" value="0" oninput="wallUpd()"></div>
+      <div class="chk"><label><input type="checkbox" id="villiC" onchange="wallUpd()"> 융털 있음</label><b id="areaTxt">표면적(상댓값) 1.0</b></div>
+      <div class="btn-row"><button class="btn" onclick="runWall()">▶ 흡수 시작</button><button class="btn secondary" onclick="clearWall()">기록 지우기</button></div>
+      <div class="msg" id="wallMsg">흡수된 양: <b id="absTxt">0</b> %</div>
+      <h4 style="margin:10px 0 4px">조건별 흡수량 겹쳐 보기</h4>
+      <svg id="wallGraph" viewBox="0 0 360 200" style="width:100%;max-width:520px;background:#fbfdfd;border-radius:12px"></svg>
+      <div class="tblwrap"><table id="wallTbl"></table></div></div>
+    <div class="card"><h3>📄 거름종이로 알아보는 표면적</h3><p>지름과 높이가 같은 원통 모양 거름종이를 병풍처럼 접으면 표면적이 어떻게 달라질까요? 접는 횟수를 정하고 물에 담가 보세요. <span class="badge">가상 측정값</span></p>
+      <div id="paperVis" style="text-align:center"></div>
+      <label><b>접은 횟수: <span id="pleatV">0</span>번</b></label><input type="range" class="range" id="pleatR" min="0" max="6" value="0" oninput="paperUpd()">
+      <div class="btn-row"><button class="btn" onclick="dipPaper()">💧 물에 담그기</button></div><div class="msg" id="paperMsg">접은 횟수를 바꿔 물에 담가 보세요.</div>
+      <div class="tblwrap"><table id="paperTbl"></table></div></div>
+    <div class="card"><h3>🔎 우리 주변에서 표면적을 넓히는 구조 찾기</h3><p>작은창자 안쪽 벽의 주름과 융털처럼 표면적을 넓히는 구조를 찾아 써 보세요.</p>
+      <textarea data-save="area" placeholder="교과서 예시: 식물의 뿌리털, 물고기의 아가미, 극세사 타월, 칫솔… 더 찾아볼까요?"></textarea>
+      <div class="btn-row"><button class="btn secondary" onclick="$('areaAns').style.display='block'">예시 보기</button></div>
+      <div class="note" id="areaAns" style="display:none">식물의 뿌리털, 물고기의 아가미, 극세사 타월, 칫솔 등이 있어요.</div></div>
+  </div>
+
+  <div class="pane" id="pane-diet">
+    <div class="card"><h3>🍍 소화를 도와주는 천연 소화제 식품 <small style="font-weight:400">(교과서 211쪽)</small></h3>
+      <p>소화제와 같은 역할을 하는 식품이 있어요. 음식(위)을 고른 뒤, 그 음식의 소화를 돕는 식품(아래)을 골라 식단을 완성해 보세요.</p>
+      <h4 style="margin:6px 0">1) 음식 고르기</h4><div class="foods" id="dishGrid"></div>
+      <h4 style="margin:10px 0 6px">2) 곁들일 식품 고르기</h4><div class="foods" id="helpGrid"></div>
+      <div class="msg" id="dietMsg">음식을 먼저 눌러 보세요.</div>
+      <div class="msg good" id="dietDone" style="display:none">🎉 6가지 음식에 알맞은 식품을 모두 곁들였어요! 나만의 천연 소화제 식단 완성!</div></div>
+    <div class="card"><h3>🔍 내가 조사한 천연 소화제 식품</h3><textarea data-save="diet" placeholder="더 조사한 식품과 그 식품이 돕는 영양소를 적어 보세요. (예: 키위, 생강, 꿀 …)"></textarea></div>
+  </div>
+  <div class="btn-row"><button class="btn secondary" onclick="goTo(1)">이전</button><button class="btn" onclick="goTo(3)">스티커 붙이기 ▶</button></div>
+</section>
+
+<!-- 4. 스티커 -->
+<section class="screen" id="screen-sticker">
+  <h2>🏷️ 스티커 붙이기: 소화 정리 노트</h2>
+  <p>스티커를 눌러 고른 뒤, 알맞은 빈칸을 눌러 붙이세요. 다 붙였으면 <b>확인하기</b>! 어디에도 붙지 않는 스티커가 섞여 있어요.</p>
+  <div class="stkround" id="stkRound"></div>
+  <div class="card"><h3 id="stkTitle"></h3><p id="stkDesc"></p><div class="stkstat"><span id="stkCount">0 / 0</span> 붙임 · 시도 <span id="stkTry">0</span>회</div><div id="stkBoard"></div></div>
+  <div class="card"><h3>스티커 보관함</h3><div class="stktray" id="stkTray"></div></div>
+  <div class="stamp" id="stamp">완성! 🎉</div>
+  <div class="card" id="stkDone" style="display:none"><b id="stkSum"></b></div>
+  <div class="btn-row"><button class="btn secondary" onclick="goTo(2)">이전</button><button class="btn secondary" onclick="resetStickers()">처음부터</button><button class="btn" onclick="checkStickers()">확인하기</button><button class="btn" id="stkNextBoard" style="display:none" onclick="nextBoard()">다음 판 ▶</button><button class="btn" id="stkNext" style="display:none" onclick="goTo(4)">실생활로 ▶</button></div>
+</section>
+
+<!-- 5. 실생활 -->
+<section class="screen" id="screen-life">
+  <h2>🌏 우리 생활 속 소화</h2>
+  <div class="life" id="lifeGrid"></div>
+  <div class="btn-row"><button class="btn secondary" onclick="goTo(3)">이전</button><button class="btn" onclick="startQuiz()">개념 확인 문제 풀기 ▶</button></div>
+</section>
+
+<!-- 6. 퀴즈 -->
+<section class="screen" id="screen-quiz">
+  <div class="prog"><div id="qbar"></div></div>
+  <h2 id="qnum">문제 1 / 10</h2>
+  <div id="qtext" style="font-size:18px;line-height:1.6;font-weight:600;margin-bottom:12px"></div>
+  <div id="qchoices"></div><div class="expl" id="qexp"></div>
+  <div class="btn-row"><button class="btn" id="qnext" style="display:none" onclick="nextQ()">다음 문제 ▶</button></div>
+</section>
+
+<section class="screen" id="screen-result">
+  <div class="card" style="text-align:center">
+    <h2>수고했어요! 🎉</h2>
+    <div class="score"><span id="fscore">0</span> / <span id="ftotal">10</span></div>
+    <p id="ftime"></p><p id="fmsg" style="font-weight:700"></p>
+    <div id="fwrong" style="text-align:left"></div>
+  </div>
+  <div class="card check"><h3>✅ 학습목표 자가 점검</h3>
+    <label><input type="checkbox"> 이제 나는 소화가 필요한 까닭을 영양소의 크기와 세포막 통과로 설명할 수 있다.</label>
+    <label><input type="checkbox"> 이제 나는 소화계를 이루는 기관의 이름과 기능을 설명할 수 있다.</label>
+    <label><input type="checkbox"> 이제 나는 침의 소화 작용을 실험 결과로 추론할 수 있다.</label>
+    <label><input type="checkbox"> 이제 나는 녹말·단백질·지방의 소화 과정을 소화효소의 작용과 관련지어 설명할 수 있다.</label>
+    <label><input type="checkbox"> 이제 나는 작은창자의 주름·융털과 영양소 흡수의 관계를 설명할 수 있다.</label>
+    <p style="margin-top:8px">📸 이 화면을 캡처해서 제출하세요.</p></div>
+  <div class="btn-row" style="justify-content:center"><button class="btn secondary" id="retryBtn" onclick="retryWrong()">틀린 문제 다시 풀기</button><button class="btn" onclick="goTo(0)">처음으로</button></div>
+</section>
+</div>
+<footer>Made by Lee Jae Kwang</footer>
+<script>
+/* ============ 공통 ============ */
+const $=id=>document.getElementById(id);
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+const hasB=w=>{const c=w.charCodeAt(w.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0};
+const eun=w=>w+(hasB(w)?'은':'는'),iga=w=>w+(hasB(w)?'이':'가');
+function sh(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1])}
+function hex(c){return[1,3,5].map(i=>parseInt(c.substr(i,2),16))}
+function mix(a,b,t){t=Math.max(0,Math.min(1,t));const x=hex(a),y=hex(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+function multi(stops,t){for(let i=0;i<stops.length-1;i++){if(t<=stops[i+1][0]){const [t0,c0]=stops[i],[t1,c1]=stops[i+1];return mix(c0,c1,(t-t0)/(t1-t0))}}return stops[stops.length-1][1]}
+const SCREENS=['screen-intro','screen-concept','screen-experiment','screen-sticker','screen-life','screen-quiz','screen-result'];
+const STEP_NAMES=['도입','개념','탐구','스티커','실생활','확인'];
+const PROG=lsGet('vlab-digest-prog',{max:0});
+let curScreen=0,maxReached=PROG.max||0;
+function renderSteps(idx){
+  const w=$('steps');w.innerHTML='';
+  STEP_NAMES.forEach((n,i)=>{const b=document.createElement('button');
+    b.className='step'+(i<idx?' done':'')+(i===idx?' active':'');b.textContent=(i+1)+' '+n;
+    b.onclick=()=>{if(i<=maxReached&&i<5)goTo(i)};w.appendChild(b)});
+}
+function goTo(i){
+  curScreen=i;maxReached=Math.max(maxReached,Math.min(i,4));lsSet('vlab-digest-prog',{max:maxReached});
+  SCREENS.forEach((id,k)=>$(id).classList.toggle('active',k===i));
+  renderSteps(Math.min(i,5));window.scrollTo(0,0);
+  if(i===0)$('resumeBtn').style.display=maxReached>0?'inline-block':'none';
+}
+function resume(){goTo(Math.max(1,maxReached))}
+renderSteps(0);if(maxReached>0)$('resumeBtn').style.display='inline-block';
+document.querySelectorAll('.tab[data-tab]').forEach(t=>t.onclick=()=>openTab(t.dataset.tab));
+function openTab(n){
+  document.querySelectorAll('.tab[data-tab]').forEach(t=>t.classList.toggle('active',t.dataset.tab===n));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+n));
+  if(n==='saliva')salRefresh();
+  window.scrollTo(0,0);
+}
+const NOTES=lsGet('vlab-digest-notes',{});
+document.querySelectorAll('textarea[data-save]').forEach(t=>{
+  t.value=NOTES[t.dataset.save]||'';
+  t.addEventListener('input',()=>{NOTES[t.dataset.save]=t.value;lsSet('vlab-digest-notes',NOTES)});
+});
+/* 작은 선택형 문항 카드 */
+function qcard(host,q,opts,ans,exp){
+  const d=document.createElement('div');d.className='qc';d.innerHTML=`<b>${q}</b>`;
+  const fb=document.createElement('div');fb.className='fb';let done=false;
+  opts.forEach((o,i)=>{const b=document.createElement('button');b.className='qopt';b.textContent=o;
+    b.onclick=()=>{if(done&&i!==ans)return;
+      if(i===ans){done=true;b.classList.add('correct');b.textContent='✔ '+o;fb.innerHTML='<b>정답!</b> '+exp}
+      else{b.classList.add('wrong');b.textContent='✖ '+o;fb.innerHTML='다시 생각해 볼까요? 한 번 더 골라 보세요.'}
+      fb.classList.add('show')};d.appendChild(b)});
+  d.appendChild(fb);host.appendChild(d);
+}
+
+/* ============ 소화계 그림 ============ */
+const ORGANS=[
+ {id:'mouth',name:'입',side:'L',row:0,tx:300,ty:30,desc:'<b>입</b>: 이로 음식물을 잘게 부수고 혀로 침과 골고루 섞어요. 침 속 아밀레이스가 녹말을 소화해요.',hints:['음식물이 가장 먼저 들어오는 곳이에요','이로 부수고 침과 섞어요']},
+ {id:'esoph',name:'식도',side:'L',row:1,tx:300,ty:90,desc:'<b>식도</b>: 입과 위를 연결하는 가늘고 긴 관이에요. 음식물을 위로 내려보내요.',hints:['입과 위를 연결하는 관이에요','소화액은 나오지 않고 음식물을 내려보내요']},
+ {id:'liver',name:'간',side:'L',row:2,tx:230,ty:160,desc:'<b>간</b>: 쓸개즙을 만들고 영양소를 저장하며 독성 물질을 해독해요. 음식물이 지나가지는 않아요.',hints:['몸에서 가장 큰 갈색 기관이에요','쓸개즙을 만들어요']},
+ {id:'gall',name:'쓸개',side:'L',row:3,tx:278,ty:203,desc:'<b>쓸개</b>: 간에서 만든 쓸개즙을 저장했다가, 음식물이 작은창자로 들어오면 분비해요.',hints:['간 아래에 붙은 작은 초록 주머니예요','쓸개즙을 저장해요']},
+ {id:'large',name:'큰창자',side:'L',row:4,tx:258,ty:305,desc:'<b>큰창자</b>: 작은창자보다 굵은 관이에요. 소화 작용은 거의 없고, 남은 찌꺼기 속 물을 주로 흡수해요.',hints:['작은창자를 둘러싼 굵은 관이에요','물을 주로 흡수해요']},
+ {id:'saliva',name:'침샘',side:'R',row:0,tx:338,ty:52,desc:'<b>침샘</b>: 침을 분비해요. 침에는 소화효소인 아밀레이스가 들어 있어요.',hints:['입 가까이에 있어요','침을 만들어 내보내요']},
+ {id:'stomach',name:'위',side:'R',row:1,tx:360,ty:170,desc:'<b>위</b>: 주머니 모양이에요. 소화효소인 펩신과 염산이 든 위액을 분비해 단백질을 소화해요.',hints:['주머니 모양이고 식도와 이어져 있어요','펩신이 든 위액을 분비해요']},
+ {id:'pancreas',name:'이자',side:'R',row:2,tx:372,ty:218,desc:'<b>이자</b>: 녹말·단백질·지방을 각각 분해하는 소화효소가 모두 든 이자액을 만들어 작은창자로 보내요.',hints:['위 아래쪽에 길쭉하게 있어요','소화효소가 모두 든 이자액을 만들어요']},
+ {id:'small',name:'작은창자',side:'R',row:3,tx:345,ty:297,desc:'<b>작은창자</b>: 길고 가는 관이에요. 탄수화물·단백질·지방의 소화가 모두 일어나고, 최종 소화 산물이 흡수돼요.',hints:['구불구불 길고 가는 관이에요','영양소를 흡수하는 곳이에요']},
+ {id:'anus',name:'항문',side:'R',row:4,tx:318,ty:388,desc:'<b>항문</b>: 작은창자와 큰창자에서 흡수되고 남은 찌꺼기를 몸 밖으로 내보내요.',hints:['소화관의 맨 끝이에요','찌꺼기를 몸 밖으로 내보내요']}
+];
+const ROWY=r=>3+r*19.4;
+function dsShapes(){return `
+<g class="organ" data-id="large"><path d="M262,360 L255,262 Q255,245 275,245 L345,245 Q368,245 368,265 L368,345 Q368,368 340,372 L318,378" fill="none" stroke="#b8845a" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="organ" data-id="small"><path d="M330,210 C330,230 318,245 300,262 L345,262 L345,276 L285,276 L285,290 L345,290 L345,304 L285,304 L285,318 L345,318 L345,332 L300,332" fill="none" stroke="#f2a65a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="organ" data-id="pancreas"><path d="M290,222 C320,208 360,208 385,218 C388,226 360,232 330,232 C310,234 295,234 290,222 Z" fill="#e9c46a" stroke="#b38b1d"/></g>
+<g class="organ" data-id="esoph"><path d="M300,40 C300,80 297,100 300,135" fill="none" stroke="#e58b8b" stroke-width="12" stroke-linecap="round"/></g>
+<g class="organ" data-id="stomach"><path d="M300,126 C300,118 330,118 345,133 C378,158 380,205 345,208 C318,212 305,195 312,175 C316,160 300,150 300,140 Z" fill="#f08a7e" stroke="#b04a40"/></g>
+<g class="organ" data-id="liver"><path d="M200,150 C215,125 270,128 312,140 C322,160 300,185 262,192 C225,198 195,180 200,150 Z" fill="#9c5a3c" stroke="#6e3a24"/></g>
+<g class="organ" data-id="gall"><ellipse cx="278" cy="200" rx="7" ry="11" fill="#3fa34d" stroke="#1f6b2b"/></g>
+<g class="organ" data-id="mouth"><ellipse cx="300" cy="30" rx="26" ry="12" fill="#f4a6a6" stroke="#c46b6b"/><path d="M280,28 H320" stroke="#fff" stroke-width="3"/></g>
+<g class="organ" data-id="saliva"><ellipse cx="262" cy="52" rx="10" ry="14" fill="#7fcfdc" stroke="#2c8c9b"/><ellipse cx="338" cy="52" rx="10" ry="14" fill="#7fcfdc" stroke="#2c8c9b"/></g>
+<g class="organ" data-id="anus"><circle cx="318" cy="388" r="8" fill="#d77" stroke="#a44"/></g>`}
+function buildDS(host,mode,onPick){
+  const W=600,H=560;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><g transform="translate(0,15) scale(1,1.15)">${dsShapes()}</g>`;
+  ORGANS.forEach(o=>{const sy=(ROWY(o.row)+5.6)/100*H;const sx=o.side==='L'?144:456;const ty=15+1.15*o.ty;
+    svg+=`<line x1="${sx}" y1="${sy}" x2="${o.tx}" y2="${ty}" stroke="#6b8f95" stroke-width="1.6" stroke-dasharray="4 3"/><circle cx="${o.tx}" cy="${ty}" r="4" fill="#0b7285"/>`});
+  svg+='</svg>';host.innerHTML=svg;
+  ORGANS.forEach(o=>{
+    const el=document.createElement(mode==='concept'?'button':'div');
+    el.style.left=(o.side==='L'?1:76)+'%';el.style.top=ROWY(o.row)+'%';
+    if(mode==='concept'){el.className='olabel';el.textContent=o.name;el.dataset.id=o.id;el.onclick=()=>onPick(o.id)}
+    else{el.className='slot';el.id='slot-b1-'+o.id}
+    host.appendChild(el)});
+  if(mode==='concept')host.querySelectorAll('.organ').forEach(g=>g.onclick=()=>onPick(g.dataset.id));
+}
+buildDS($('dsConcept'),'concept',id=>{
+  const o=ORGANS.find(x=>x.id===id);$('organTip').innerHTML=o.desc;
+  document.querySelectorAll('#dsConcept .olabel').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  document.querySelectorAll('#dsConcept .organ').forEach(g=>g.classList.toggle('on',g.dataset.id===id));
+});
+
+/* ============ 개념 ① 세포막 ============ */
+const PART=[
+ {id:'starch',name:'녹말',big:true,sub:'큼',draw:()=>[-14,0,14].map(x=>[-6,6].map(y=>`<circle cx="${x}" cy="${y}" r="6.5" fill="#6741d9" stroke="#fff"/>`).join('')).join('')},
+ {id:'prot',name:'단백질',big:true,sub:'큼',draw:()=>[[-12,-6],[0,-10],[12,-4],[6,8],[-8,8]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#d6336c" stroke="#fff"/>`).join('')},
+ {id:'fat',name:'지방',big:true,sub:'큼',draw:()=>`<circle r="17" fill="#f59f00" stroke="#b36200" stroke-width="2"/><circle cx="-5" cy="-5" r="4" fill="#ffe08a"/>`},
+ {id:'glu',name:'포도당',big:false,sub:'작음',draw:()=>`<circle r="6" fill="#6741d9" stroke="#fff"/>`},
+ {id:'amino',name:'아미노산',big:false,sub:'작음',draw:()=>`<circle r="6" fill="#d6336c" stroke="#fff"/>`},
+ {id:'fa',name:'지방산',big:false,sub:'작음',draw:()=>`<ellipse rx="8" ry="5" fill="#f59f00" stroke="#fff"/>`}];
+(function(){
+  const svg=$('memSvg');
+  svg.innerHTML=`<rect x="0" y="0" width="360" height="170" fill="#f3fafb"/>
+  <rect x="172" y="0" width="16" height="40" fill="#f2b8c6" stroke="#c2185b"/><rect x="172" y="58" width="16" height="52" fill="#f2b8c6" stroke="#c2185b"/><rect x="172" y="128" width="16" height="42" fill="#f2b8c6" stroke="#c2185b"/>
+  <text x="180" y="12" text-anchor="middle" font-size="11" fill="#7a2c4a" font-weight="700" transform="translate(0,0)"></text>
+  <text x="60" y="160" text-anchor="middle" font-size="12" fill="#55656b" font-weight="700">세포 밖 (소화관)</text><text x="290" y="160" text-anchor="middle" font-size="12" fill="#55656b" font-weight="700">세포 안</text>
+  <text x="180" y="165" text-anchor="middle" font-size="11" fill="#c2185b" font-weight="800">세포막</text>
+  <g id="memP" class="ptc" style="transform:translate(60px,85px)"></g>`;
+  const ch=$('memChips');
+  PART.forEach(p=>{const b=document.createElement('button');b.className='chip';b.innerHTML=p.name+'<small>'+p.sub+'</small>';b.onclick=()=>passPart(p,b);ch.appendChild(b)});
+})();
+let memBusy=false;
+function passPart(p,btn){
+  if(memBusy)return;memBusy=true;
+  document.querySelectorAll('#memChips .chip').forEach(c=>c.classList.remove('sel'));btn.classList.add('sel');
+  const g=$('memP');g.style.transition='none';g.style.transform='translate(50px,50px)';g.innerHTML=p.draw();
+  const yy=p.big?49:49;
+  setTimeout(()=>{g.style.transition='transform .9s ease-in-out';g.style.transform=`translate(${p.big?148:150}px,${yy}px)`},30);
+  setTimeout(()=>{
+    if(p.big){g.style.transform='translate(110px,72px)';$('memTip').innerHTML=`<b>✖ ${p.name}</b>${hasB(p.name)?'은':'는'} 크기가 커서 세포막 구멍을 통과하지 못해요. 그래서 <b>소화</b>가 필요해요!`}
+    else{g.style.transform='translate(280px,49px)';$('memTip').innerHTML=`<b>✔ ${p.name}</b>${hasB(p.name)?'은':'는'} 크기가 작아서 세포막을 통과해 세포 안으로 들어갈 수 있어요.`}
+  },1000);
+  setTimeout(()=>{memBusy=false},2000);
+}
+
+/* ============ 개념 ③ 열쇠-자물쇠 ============ */
+const ENZ=[{id:'amy',name:'아밀레이스',shape:'tri'},{id:'pep',name:'펩신',shape:'sq'},{id:'tri',name:'트립신',shape:'sq'},{id:'lip',name:'라이페이스',shape:'cir'}];
+const NUT=[{id:'starch',name:'녹말',shape:'tri',c:'#6741d9'},{id:'prot',name:'단백질',shape:'sq',c:'#d6336c'},{id:'fat',name:'지방',shape:'cir',c:'#f59f00'}];
+let keyE=null,keyN=null;
+function shp(t,cx,cy,s){return t==='tri'?`M${cx},${cy-s} L${cx+s},${cy+s*.8} L${cx-s},${cy+s*.8} Z`:t==='sq'?`M${cx-s*.85},${cy-s*.85} h${s*1.7} v${s*1.7} h${-s*1.7} Z`:`M${cx-s},${cy} a${s},${s} 0 1,0 ${2*s},0 a${s},${s} 0 1,0 ${-2*s},0 Z`}
+function keyDraw(){
+  const e=ENZ.find(x=>x.id===keyE),n=NUT.find(x=>x.id===keyN);let h='';
+  if(e)h+=`<path fill-rule="evenodd" fill="#0b7285" d="M20,20 h100 v70 h-100 Z ${shp(e.shape,70,55,17)}"/><text x="70" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="#095c6b">${e.name}</text>`;
+  if(n){const fit=e&&e.shape===n.shape;const cx=fit?70:250;h+=`<path d="${shp(n.shape,cx,55,15)}" fill="${n.c}" stroke="#fff" stroke-width="2" style="transition:all .4s"/><text x="250" y="106" text-anchor="middle" font-size="12" font-weight="800" fill="${n.c}">${n.name}</text>`}
+  $('keySvg').innerHTML=h;
+  if(e&&n){const fit=e.shape===n.shape;$('keyTip').innerHTML=fit?`<b>✔ 딱 맞아요!</b> ${eun(e.name)} ${n.name}의 분해를 촉진해요.`:`<b>✖ 맞지 않아요.</b> ${eun(e.name)} ${n.name}에는 작용하지 않아요. 소화효소는 특정 영양소에만 작용해요.`}
+  else $('keyTip').textContent='소화효소와 영양소를 각각 골라 보세요.';
+  document.querySelectorAll('#enzChips .chip').forEach(c=>c.classList.toggle('sel',c.dataset.id===keyE));
+  document.querySelectorAll('#nutChips .chip').forEach(c=>c.classList.toggle('sel',c.dataset.id===keyN));
+}
+ENZ.forEach(e=>{const b=document.createElement('button');b.className='chip';b.dataset.id=e.id;b.textContent='🔑 '+e.name;b.onclick=()=>{keyE=e.id;keyDraw()};$('enzChips').appendChild(b)});
+NUT.forEach(n=>{const b=document.createElement('button');b.className='chip';b.dataset.id=n.id;b.textContent='🍽️ '+n.name;b.onclick=()=>{keyN=n.id;keyDraw()};$('nutChips').appendChild(b)});
+
+/* ============ 개념 ⑤ 융털 ============ */
+(function(){
+  let s=`<rect width="360" height="200" fill="#fffbe6"/><rect y="170" width="360" height="30" fill="#f5b7c8"/>
+  <text x="180" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#7a5a00">작은창자 속 (소화된 영양소)</text>`;
+  [[20,0],[130,0]].forEach(v=>{const x=v[0];
+    s+=`<rect x="${x}" y="62" width="82" height="130" rx="40" fill="#ffd9e3" stroke="#e64980" stroke-width="2"/>
+    <path d="M${x+14},170 V92 Q${x+14},76 ${x+28},76 Q${x+41},76 ${x+41},92 M${x+68},170 V92 Q${x+68},76 ${x+54},76 Q${x+41},76 ${x+41},92" fill="none" stroke="#e03131" stroke-width="5" stroke-linecap="round"/>
+    <path d="M${x+41},170 V100" stroke="#8ec23a" stroke-width="7" stroke-linecap="round"/>`;
+    [[x+10,0],[x+41,.6],[x+66,1.2]].forEach(d=>{s+=`<circle cx="${d[0]}" cy="40" r="5" fill="#4263eb"><animate attributeName="cy" values="30;110" dur="3s" begin="${d[1]}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="3s" begin="${d[1]}s" repeatCount="indefinite"/></circle>`});
+    s+=`<ellipse cx="${x+41}" cy="40" rx="7" ry="4" fill="#f59f00"><animate attributeName="cy" values="30;110" dur="3s" begin="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;1;0" dur="3s" begin="1.5s" repeatCount="indefinite"/></ellipse>`});
+  s+=`<text x="61" y="188" text-anchor="middle" font-size="11" font-weight="800" fill="#7a2c4a">융털</text>
+  <text x="228" y="116" font-size="11" font-weight="800" fill="#c92a2a">← 모세혈관</text><text x="228" y="134" font-size="11" font-weight="800" fill="#4a7a10">암죽관 ↑</text>
+  <text x="228" y="60" font-size="11" fill="#364fc7" font-weight="800">● 포도당·아미노산</text><text x="228" y="76" font-size="11" fill="#b36200" font-weight="800">⬬ 지방산 등</text>`;
+  $('villiSvg').innerHTML=s;
+})();
+
+/* ============ 오개념 ============ */
+const MIS=[
+ ['소화효소는 가위처럼 영양소를 잘라 주기만 한다.','소화효소가 작용하면 <b>화학적으로 다른 물질</b>(예: 녹말 → 엿당)이 생겨요. 소화효소는 분해를 촉진하는 물질이에요.'],
+ ['쓸개즙은 쓸개에서 만들어진다.','쓸개즙은 <b>간</b>에서 만들어져 쓸개에 저장되었다가 작은창자로 분비돼요.'],
+ ['쓸개즙에도 소화효소가 들어 있다.','쓸개즙에는 소화효소가 없어요. 대신 <b>지방의 소화가 잘 일어나도록</b> 도와요.'],
+ ['간·쓸개·이자로도 음식물이 지나간다.','음식물은 <b>소화관</b>(입-식도-위-작은창자-큰창자-항문)만 지나가요. 간·쓸개·이자·침샘은 소화액을 만들거나 저장·분비해요.'],
+ ['소화는 음식물을 이로 잘게 부수는 것이다.','이로 부수는 것은 소화를 돕는 일이고, 소화의 핵심은 <b>소화효소로 영양소를 작은 영양소로 분해</b>하는 거예요.'],
+ ['큰창자에서 영양소가 소화·흡수된다.','큰창자에서는 소화 작용이 거의 일어나지 않고 주로 <b>물</b>이 흡수돼요. 영양소는 작은창자에서 흡수돼요.'],
+ ['염산은 소화효소다.','염산은 효소가 아니에요. 위액 속에서 <b>펩신의 작용을 돕고</b> 음식물 속 세균을 죽여요.']];
+$('misWrap').innerHTML=MIS.map(m=>`<div class="mis"><div class="x">❌ 흔한 생각 → ${m[0]}</div><div class="o">✅ 실제로는 → ${m[1]}</div></div>`).join('');
+
+/* ============ 탐구 계획서 ============ */
+const PREP=['5 % 녹말 용액','아이오딘-아이오딘화 칼륨 용액','베네딕트 용액','증류수','35~40 ℃의 물','뜨거운 물(80~90 ℃)','비커','시험관','받침 유리','스포이트','시험관대','시험관 집게','디지털 온도계','핀셋','거즈','실험복','보안경','실험용 장갑','면장갑'];
+$('prepList').innerHTML=PREP.map((p,i)=>`<label><input type="checkbox" data-p="${i}"> ${p}</label>`).join('');
+const PCK=lsGet('vlab-digest-prep',{});
+document.querySelectorAll('#prepList input').forEach(c=>{c.checked=!!PCK[c.dataset.p];c.parentNode.classList.toggle('on',c.checked);
+  c.onchange=()=>{PCK[c.dataset.p]=c.checked;c.parentNode.classList.toggle('on',c.checked);lsSet('vlab-digest-prep',PCK)}});
+const SAFE=lsGet('vlab-digest-safe',{ok:false});
+const sfs=[...document.querySelectorAll('.sf')];
+function sfUpd(){const ok=sfs.every(c=>c.checked);$('startLab').disabled=!ok;if(ok){SAFE.ok=true;lsSet('vlab-digest-safe',SAFE)}salRefresh()}
+sfs.forEach(c=>{c.checked=SAFE.ok;c.onchange=sfUpd});$('startLab').disabled=!SAFE.ok;
+function salRefresh(){const ok=sfs.every(c=>c.checked);$('salLock').style.display=ok?'none':'block';$('salBody').style.display=ok?'block':'none'}
+
+/* ============ 가상실험 ① 침의 소화 작용 ============ */
+const K0=.30;
+const kT=T=>T<=37?K0*Math.exp(-Math.pow((37-T)/22,2)):K0*Math.exp(-Math.pow((T-37)/9,2));
+const Sfun=(t,k)=>Math.exp(-k*t);
+const IOD=[[0,'#c9923e'],[.15,'#6b4f8a'],[.5,'#2c3a8c'],[1,'#1b2a6e']];
+const BEN=[[0,'#2f74d0'],[.15,'#2b9aa8'],[.35,'#7cbf4a'],[.5,'#d8c630'],[.72,'#ee8a12'],[.92,'#c2410c'],[1,'#b0360a']];
+function iodLabel(S){return S>.8?'청람색':S>.4?'짙은 청자색':S>.12?'옅은 청자색':S>.03?'황갈색 (옅은 청자색 기미)':'황갈색'}
+function benLabel(M){return M<.08?'파란색 (변화 없음, −)':M<.25?'청록색':M<.5?'연두색~노란색':M<.88?'주황색':'황적색 침전 (+)'}
+let SAL,timerId=null;
+function newSal(){return {rinse:false,make:false,starch:false,water:false,saliva:false,bath:false,tm:0,run:false,iod:null,ben:null,heat:false}}
+SAL=newSal();
+(function(){
+  const tube=(x,l)=>`<clipPath id="cp${l}"><path d="M${x},40 v160 a22,22 0 0 0 44,0 v-160 Z"/></clipPath><rect id="liq${l}" clip-path="url(#cp${l})" x="${x}" y="222" width="44" height="0" fill="#f1efe6" class="liq"/><rect id="ppt${l}" clip-path="url(#cp${l})" x="${x}" y="200" width="44" height="0" fill="#a63a12" opacity=".75"/><path d="M${x},40 v160 a22,22 0 0 0 44,0 v-160" fill="none" stroke="#5c7f87" stroke-width="3"/><text x="${x+22}" y="28" text-anchor="middle" font-weight="800" font-size="16" fill="#095c6b">(${l==='A'?'가':'나'})</text>`;
+  $('labSvg').innerHTML=`<rect x="40" y="120" width="280" height="150" rx="8" id="bathR" fill="#cfe8f3" opacity=".75" stroke="#7aa6b5" stroke-width="2"/>
+  <text x="180" y="254" text-anchor="middle" font-size="13" font-weight="800" fill="#095c6b" id="bathTxt">물 중탕 (준비 전)</text>
+  ${tube(105,'A')}${tube(215,'B')}
+  <g id="bubs"></g>
+  <rect x="60" y="292" width="110" height="40" rx="6" fill="#e9f3f5" stroke="#9db7bd"/><rect x="190" y="292" width="110" height="40" rx="6" fill="#e9f3f5" stroke="#9db7bd"/>
+  <circle id="dropA" cx="115" cy="312" r="10" fill="none" stroke="none"/><circle id="dropB" cx="245" cy="312" r="10" fill="none" stroke="none"/>
+  <text x="115" y="345" text-anchor="middle" font-size="12" fill="#55656b" font-weight="700">받침 유리 (가)</text><text x="245" y="345" text-anchor="middle" font-size="12" fill="#55656b" font-weight="700">받침 유리 (나)</text>`;
+})();
+const ACTS=[
+ ['rinse','👄 입안을 물로 헹구고, 멸균 거즈를 혀 밑에 넣어 침을 적신다'],
+ ['make','🧫 거즈를 증류수 10 mL에 헹구어 침 용액을 만든다'],
+ ['starch','🥣 시험관 (가)·(나)에 5 % 녹말 용액을 5 mL씩 넣는다'],
+ ['water','💧 (가)에 증류수 5 mL를 넣는다'],
+ ['saliva','👅 (나)에 침 용액 5 mL를 넣는다'],
+ ['bath','♨️ 35~40 ℃의 물에 10분 정도 담가 둔다'],
+ ['iod','🟤 받침 유리에 용액을 1방울씩 떨어뜨리고 아이오딘 용액을 1방울씩 넣는다'],
+ ['ben','🔵 남은 용액에 베네딕트 용액을 2~3방울씩 넣는다'],
+ ['heat','🔥 뜨거운 물(80~90 ℃)에 담근다']];
+function renderActs(){
+  $('acts').innerHTML='';
+  ACTS.forEach(a=>{const b=document.createElement('button');const dn=isDone(a[0]);b.className='act'+(dn?' done':'');b.id='act-'+a[0];b.textContent=a[1];b.onclick=()=>doAct(a[0]);$('acts').appendChild(b)});
+}
+function isDone(id){const s=SAL;return {rinse:s.rinse,make:s.make,starch:s.starch,water:s.water,saliva:s.saliva,bath:s.bath,iod:!!s.iod,ben:!!s.ben,heat:s.heat}[id]}
+function say(t,cls){const m=$('salMsg');m.className='msg '+(cls||'');m.innerHTML=t}
+function ready(){return SAL.water&&SAL.saliva}
+function doAct(id){
+  const s=SAL;
+  if(id==='rinse'){if(s.rinse)return say('이미 했어요.');s.rinse=true;say('입안을 물로 헹군 뒤 거즈를 혀 밑에 넣었어요. 거즈에 침이 충분히 적셔졌어요.','good')}
+  else if(id==='make'){if(!s.rinse)return say('먼저 입안을 헹구고 거즈를 혀 밑에 넣어 침을 적셔야 해요. (1번)','bad');if(s.make)return say('이미 침 용액을 만들었어요.');s.make=true;say('거즈를 증류수 10 mL에 헹구어 침 용액을 만들었어요.','good')}
+  else if(id==='starch'){if(s.starch)return say('이미 넣었어요.');s.starch=true;say('(가)와 (나)에 5 % 녹말 용액을 5 mL씩 넣었어요.','good')}
+  else if(id==='water'){if(!s.starch)return say('먼저 시험관에 녹말 용액을 넣어야 해요. (3번)','bad');if(s.water)return say('이미 넣었어요.');s.water=true;say('(가)에 증류수 5 mL를 넣었어요. 침이 없는 <b>대조군</b>이에요.','good')}
+  else if(id==='saliva'){if(!s.starch)return say('먼저 시험관에 녹말 용액을 넣어야 해요. (3번)','bad');if(!s.make)return say('아직 침 용액이 없어요. 1·2번으로 침 용액을 먼저 만들어요.','bad');if(s.saliva)return say('이미 넣었어요.');s.saliva=true;say('(나)에 침 용액 5 mL를 넣었어요.','good')}
+  else if(id==='bath'){if(!ready())return say('(가)에 증류수, (나)에 침 용액을 모두 넣은 뒤에 중탕해요.','bad');if(s.bath)return say('이미 담갔어요. 시간이 흘러가고 있어요.');s.bath=true;s.run=true;startTimer();say('35~40 ℃ 물에 담갔어요. 체온과 비슷한 온도를 유지해 줘요. 10분이 지날 때까지 기다리거나, 중간에 결과를 확인해 볼 수도 있어요.','good')}
+  else if(id==='iod'){if(!ready())return say('먼저 (가), (나)에 증류수와 침 용액을 넣어야 해요.','bad');
+    const S2=kk=>Sfun(s.tm,kk);s.iod={tm:s.tm,a:S2(0),b:S2(K0)};
+    say(`<b>${s.tm.toFixed(1)}분</b> 때 결과예요 → (가) <b>${iodLabel(s.iod.a)}</b>, (나) <b>${iodLabel(s.iod.b)}</b>.`+(s.tm<9.95?' <br>교과서에서는 10분 정도 담가 둔 뒤 관찰해요. 시간을 더 흘려 다시 눌러 볼 수도 있어요.':(s.iod.b>.03?'<br>(나)에 옅은 색이 조금 남을 수 있어요. 녹말이 완전히 분해되지 않았기 때문이에요.':'')),'good')}
+  else if(id==='ben'){if(!ready())return say('먼저 (가), (나)에 증류수와 침 용액을 넣어야 해요.','bad');if(s.ben)return say('이미 넣었어요.');s.ben={tm:s.tm};say('베네딕트 용액을 넣었어요. 아직 파란색이에요. 베네딕트 반응은 <b>가열</b>해야 나타나요.','good')}
+  else if(id==='heat'){if(!s.ben)return say('먼저 베네딕트 용액을 넣어야 해요. (8번)','bad');if(s.heat)return say('이미 가열했어요.');s.heat=true;s.run=false;
+    const M=kk=>1-Sfun(s.ben.tm,kk);say(`가열했더니 (가) <b>${benLabel(M(0))}</b>, (나) <b>${benLabel(M(K0))}</b>이에요.`+(s.ben.tm<9.95?'<br>(베네딕트 용액을 넣을 때까지 담가 둔 시간: '+s.ben.tm.toFixed(1)+'분)':''),'good')}
+  paintLab();renderActs();
+}
+function startTimer(){clearInterval(timerId);$('pauseBtn').disabled=false;$('pauseBtn').textContent='⏸ 멈추기';
+  timerId=setInterval(()=>{if(!SAL.run)return;SAL.tm=Math.min(10,SAL.tm+.1);if(SAL.tm>=9.999){SAL.tm=10;SAL.run=false;clearInterval(timerId);$('pauseBtn').disabled=true;say('⏰ 10분이 지났어요! 이제 아이오딘 반응(받침 유리)과 베네딕트 반응을 확인해 보세요.','good')}timerUi()},60)}
+function togglePause(){SAL.run=!SAL.run;$('pauseBtn').textContent=SAL.run?'⏸ 멈추기':'▶ 계속하기'}
+function timerUi(){$('timerTxt').textContent='⏱ 경과 시간 '+SAL.tm.toFixed(1)+' / 10분';$('timerBar').style.width=(SAL.tm*10)+'%';if($('molBox').style.display!=='none')molUi();
+  $('bathTxt').textContent=SAL.heat?'뜨거운 물 80~90 ℃':SAL.bath?'35~40 ℃ 물 중탕':'물 중탕 (준비 전)'}
+function tubeInfo(l){ // 현재 시험관 높이/색
+  const s=SAL;const k=l==='A'?0:K0;let vol=(s.starch?5:0)+((l==='A'?s.water:s.saliva)?5:0);
+  let col=l==='A'?(s.water?'#eef3f1':'#f1efe6'):(s.saliva?'#efe9d6':'#f1efe6');let ppt=0;
+  if(s.ben&&ready()){const M=1-Sfun(s.ben.tm,k);col=s.heat?multi(BEN,M):'#2f74d0';if(s.heat&&M>=.88)ppt=1}
+  return {vol,col,ppt};
+}
+function paintLab(){
+  ['A','B'].forEach(l=>{const t=tubeInfo(l);const h=t.vol*12;const r=$('liq'+l);r.setAttribute('y',222-h);r.setAttribute('height',h);r.setAttribute('fill',t.col);
+    const p=$('ppt'+l);p.setAttribute('y',212);p.setAttribute('height',t.ppt?10:0)});
+  $('bathR').setAttribute('fill',SAL.heat?'#f6c9bd':'#cfe8f3');
+  const d=(id,col)=>{const e=$(id);e.setAttribute('fill',col||'none');e.setAttribute('stroke',col?'#0004':'none')};
+  d('dropA',SAL.iod?multi(IOD,SAL.iod.a):null);d('dropB',SAL.iod?multi(IOD,SAL.iod.b):null);
+  $('bubs').innerHTML=SAL.heat?[0,1,2,3,4,5].map(i=>`<circle class="bub" cx="${70+i*44}" cy="266" r="3" fill="#fff" opacity=".8" style="animation-delay:${i*.18}s"/>`).join(''):'';
+  timerUi();
+}
+function resetSal(){clearInterval(timerId);SAL=newSal();$('pauseBtn').disabled=true;$('pauseBtn').textContent='⏸ 멈추기';say('아래 순서대로 눌러 실험을 진행해 보세요. 순서를 어기면 힌트를 줄게요.');paintLab();renderActs()}
+function toggleMol(){const b=$('molBox');b.style.display=b.style.display==='none'?'block':'none';molUi()}
+function molUi(){
+  const rows=[['(가) 증류수',0],['(나) 침 용액',K0]].map(r=>{const S=ready()?Sfun(SAL.tm,r[1]):1;
+    return `<b>${r[0]}</b><div class="hbar"><span class="l">녹말</span><div class="t"><div style="width:${S*100}%;background:#6741d9"></div></div><b>${Math.round(S*100)}%</b></div><div class="hbar"><span class="l">엿당</span><div class="t"><div style="width:${(1-S)*100}%;background:#e8890c"></div></div><b>${Math.round((1-S)*100)}%</b></div>`}).join('');
+  $('molBox').innerHTML='<b>🔬 시험관 속 분자 수 (확대 보기)</b><br>'+rows+(ready()?'':'<p>시험관에 용액을 넣으면 값이 바뀌어요.</p>');
+}
+/* 관찰 기록 */
+const RECO=['선택하세요','청람색(청자색)','황갈색(변화 거의 없음)','파란색(변화 없음)','황적색 침전','연두~주황색(중간 색)'];
+const REC=lsGet('vlab-digest-rec',{});
+document.querySelectorAll('select[data-rec]').forEach(s=>{s.innerHTML=RECO.map((o,i)=>`<option value="${i}">${o}</option>`).join('');s.value=REC[s.dataset.rec]||0;s.onchange=()=>{REC[s.dataset.rec]=s.value;lsSet('vlab-digest-rec',REC)}});
+function checkRec(){
+  const m=$('recMsg');m.style.display='block';
+  if(!SAL.iod||!SAL.ben||!SAL.heat){m.className='msg';m.innerHTML='가상실험에서 아이오딘 반응과 베네딕트 반응(가열까지)을 모두 해 본 뒤에 확인할 수 있어요.';return}
+  const io=S=>S>.12?1:2;const be=M=>M<.08?3:M>=.88?4:5;
+  const exp={i_a:io(SAL.iod.a),i_b:io(SAL.iod.b),b_a:be(1-Sfun(SAL.ben.tm,0)),b_b:be(1-Sfun(SAL.ben.tm,K0))};
+  const nm={i_a:'과정 4 (가)',i_b:'과정 4 (나)',b_a:'과정 5 (가)',b_b:'과정 5 (나)'};
+  const res=Object.keys(exp).map(k=>{const v=+(REC[k]||0);return (v===exp[k]?'✔ ':'✖ ')+nm[k]+(v===exp[k]?'':' → 다시 관찰해 보세요')});
+  const all=Object.keys(exp).every(k=>+(REC[k]||0)===exp[k]);
+  m.className='msg '+(all?'good':'bad');m.innerHTML=res.join('<br>')+(all?'<br><b>모두 맞았어요! 이제 색이 변한 까닭을 써 보세요.</b>':'');
+}
+qcard($('salQs'),'❓ 시험관 (가)에 증류수를 넣은 까닭은?',['침 용액의 유무에 따른 결과를 비교하기 위해(대조군)','녹말을 더 많이 만들기 위해','시험관을 깨끗이 씻기 위해'],0,'(가)는 침이 없는 대조군이에요. (나)와 비교해야 침의 작용을 알 수 있어요.');
+qcard($('salQs'),'❓ 시험관을 35~40 ℃의 물에 담가 두는 까닭은?',['체온과 비슷한 온도를 유지하기 위해','용액을 끓이기 위해','침을 살균하기 위해'],0,'소화는 우리 몸속(체온)에서 일어나므로 체온과 비슷한 온도로 맞춰 줘요.');
+/* 온도 도전 */
+const TEMPS=[[0,'#4dabf7'],[20,'#20c997'],[37,'#e8590c'],[60,'#9c36b5'],[90,'#495057']];let tSel=[37];
+function tempGraph(){
+  const x=t=>40+t*30,y=s=>20+(1-s)*150;
+  let g='<line x1="40" y1="170" x2="340" y2="170" stroke="#889"/><line x1="40" y1="20" x2="40" y2="170" stroke="#889"/>';
+  [0,5,10].forEach(t=>g+=`<text x="${x(t)}" y="188" text-anchor="middle" font-size="11" fill="#55656b">${t}분</text>`);
+  [0,.5,1].forEach(s=>g+=`<text x="34" y="${y(s)+4}" text-anchor="end" font-size="11" fill="#55656b">${s*100}%</text>`);
+  tSel.forEach((T,i)=>{const c=TEMPS.find(a=>a[0]===T)[1];let p='';for(let t=0;t<=10.01;t+=.5)p+=(p?' ':'')+x(t)+','+y(Sfun(t,kT(T)));
+    g+=`<polyline points="${p}" fill="none" stroke="${c}" stroke-width="3"/><text x="${344-4}" y="${y(Sfun(10,kT(T)))-4}" text-anchor="end" font-size="11" fill="${c}" font-weight="800">${T}℃</text>`});
+  g+='<text x="190" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="#095c6b">남은 녹말(%) - 시간(분)</text>';
+  $('tempSvg').innerHTML=g;
+}
+TEMPS.forEach(t=>{const b=document.createElement('button');b.className='chip'+(tSel.includes(t[0])?' sel':'');b.textContent=t[0]+' ℃';b.dataset.t=t[0];
+  b.onclick=()=>{const T=t[0];tSel=tSel.includes(T)?tSel.filter(a=>a!==T):tSel.concat(T);b.classList.toggle('sel',tSel.includes(T));tempGraph()};$('tempChips').appendChild(b)});
+tempGraph();
+renderActs();paintLab();
+
+/* ============ 가상실험 ② 소화 여행 ============ */
+const STG=['입','식도','위','작은창자','큰창자'];
+const NS={
+ starch:{name:'녹말',rows:4,cols:6,pass:1,st:[ [[6],[6],[6],[6]], [[6],[6],[2,2,2],[2,2,2]], null,null, [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]] ],
+   ans:{0:'아밀레이스',2:'없음',3:'아밀레이스'}},
+ prot:{name:'단백질',rows:3,cols:6,pass:1,st:[ [[6],[6],[6]], null,[[3,3],[3,3],[3,3]],[[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]] ],
+   ans:{0:'없음',2:'펩신',3:'트립신'}},
+ fat:{name:'지방',rows:3,cols:4,pass:2,st:[ [[4],[4],[4]], null,null,[[2,1,1],[2,1,1],[2,1,1]] ],
+   ans:{0:'없음',2:'없음',3:'라이페이스'}}};
+/* 각 영양소의 단계별 상태: 도착(init) → 입 후 → 식도 후 → 위 후 → 작은창자 후 */
+const ST={
+ starch:[ [[6],[6],[6],[6]], [[6],[6],[2,2,2],[2,2,2]], [[6],[6],[2,2,2],[2,2,2]], [[6],[6],[2,2,2],[2,2,2]], [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]] ],
+ prot:[ [[6],[6],[6]], [[6],[6],[6]], [[6],[6],[6]], [[3,3],[3,3],[3,3]], [[1,1,1,1,1,1],[1,1,1,1,1,1],[1,1,1,1,1,1]] ],
+ fat:[ [[4],[4],[4]], [[4],[4],[4]], [[4],[4],[4]], [[4],[4],[4]], [[2,1,1],[2,1,1],[2,1,1]] ]};
+/* ST[nut][k] = k번째 기관(0 입,1 식도,2 위,3 작은창자)을 지나기 '전' 상태, k=4는 작은창자 통과 후 */
+const EXPL={
+ starch:{0:'침 속 아밀레이스가 녹말의 일부를 엿당으로 분해해요.',2:'위액에는 녹말을 분해하는 소화효소가 없어요. 녹말은 위에서 소화되지 않아요.',3:'아밀레이스가 작용해 녹말이 최종적으로 포도당이 돼요. 포도당은 작아서 세포막을 통과할 수 있어요.'},
+ prot:{0:'침에는 단백질을 분해하는 소화효소가 없어요. 입에서 단백질은 소화되지 않아요.',2:'위액의 펩신이 염산의 도움을 받아 단백질을 더 작은 크기로 분해해요.',3:'이자액의 트립신이 단백질을 더 분해해 최종적으로 아미노산이 돼요.'},
+ fat:{0:'입에서는 지방이 소화되지 않아요.',2:'위액에는 지방을 분해하는 소화효소가 없어요. 지방은 위에서 소화되지 않아요.',3:'쓸개즙(효소 없음)이 지방의 소화를 돕고, 이자액의 라이페이스가 지방을 지방산과 모노글리세라이드로 분해해요.'}};
+const SUB=['이로 부수고 혀로 침과 섞어요. 침샘에서 침(아밀레이스가 들어 있어요)이 나와요.','음식물을 위로 내려보내는 관이에요. 소화액이 나오지 않아요.','위액이 나와요. 위액에는 펩신과 강한 산성의 염산이 들어 있어요.','이자액(아밀레이스·트립신·라이페이스)과 쓸개즙이 나와 음식물과 섞여요.','작은창자에서 흡수되고 남은 찌꺼기가 와요. 소화 작용은 거의 없고 주로 물이 흡수돼요.'];
+const OPTS=['없음','아밀레이스','펩신','트립신','라이페이스'];
+const BCOL=['#d6336c','#f06595','#c2255c','#e64980','#a61e4d','#ff8787'];
+function molSvg(nut,groups){
+  const n=NS[nut],R=n.rows,C=n.cols,dx=C===4?64:48,x0=(300-dx*(C-1))/2,gy=(150-(R-1)*36)/2;let s='';
+  groups.forEach((gr,r)=>{const y=gy+r*36;let c=0;
+    gr.forEach(len=>{for(let i=0;i<len;i++){const col=nut==='starch'?'#6741d9':nut==='prot'?BCOL[(c+i)%6]:(c+i===0?'#b36200':'#f59f00');
+        if(i>0)s+=`<line x1="${x0+(c+i-1)*dx}" y1="${y}" x2="${x0+(c+i)*dx}" y2="${y}" stroke="#555" stroke-width="4"/>`}
+      c+=len});
+    c=0;gr.forEach(len=>{for(let i=0;i<len;i++){const col=nut==='starch'?'#6741d9':nut==='prot'?BCOL[(c+i)%6]:(c+i===0?'#b36200':'#f59f00');
+        s+=`<circle cx="${x0+(c+i)*dx}" cy="${y}" r="${nut==='fat'?11:10}" fill="${col}" stroke="#fff" stroke-width="2"/>`}c+=len})});
+  return s;
+}
+function passRatio(nut,groups){let tot=0,ok=0;groups.forEach(gr=>gr.forEach(l=>{tot+=l;if(l<=NS[nut].pass)ok+=l}));return Math.round(ok/tot*100)}
+let J={nut:null,st:0,conf:false,sel:null,score:0,asked:0};
+function jInit(){
+  const w=$('jNut');Object.keys(NS).forEach(k=>{const b=document.createElement('button');b.className='chip';b.dataset.n=k;b.textContent=({starch:'🍚 ',prot:'🥚 ',fat:'🧈 '})[k]+NS[k].name;b.onclick=()=>{J={nut:k,st:0,conf:false,sel:null,score:0,asked:0};jRender()};w.appendChild(b)});
+  jRender();
+  /* 정리표 */
+  $('jTbl').innerHTML='<tr><th>영양소</th><th>입</th><th>위</th><th>작은창자</th></tr>'+Object.keys(NS).map(k=>`<tr><th>${NS[k].name}</th>`+['입','위','작은창자'].map(s=>`<td><label class="chk" style="margin:0;justify-content:center"><input type="checkbox" data-n="${k}" data-s="${s}"> 소화돼요</label></td>`).join('')+'</tr>').join('');
+}
+function jRender(){
+  document.querySelectorAll('#jNut .chip').forEach(c=>c.classList.toggle('sel',c.dataset.n===J.nut));
+  const st=$('jStage');st.innerHTML=STG.map((s,i)=>`<div class="sg ${i===J.st?'cur':i<J.st?'past':''}">${s}</div>`).join('');
+  if(!J.nut){$('jTitle').textContent='영양소를 먼저 골라 주세요';$('jSub').textContent='위에서 녹말·단백질·지방 중 하나를 눌러 여행을 시작해요.';$('jBefore').innerHTML='';$('jAfter').innerHTML='';$('jPbar').style.width='0%';$('jPbar').textContent='0%';$('jAsk').innerHTML='';$('jNext').style.display='none';$('jMsg').style.display='none';return}
+  const nut=J.nut,s=J.st,before=ST[nut][s],after=ST[nut][Math.min(4,s+1)];
+  const asks=(s===0||s===2||s===3);
+  $('jTitle').textContent='📍 '+STG[s]+' · '+NS[nut].name;$('jSub').textContent=SUB[s];
+  $('jBefore').innerHTML=molSvg(nut,before);
+  const show=!asks||J.conf;
+  $('jAfter').innerHTML=show?molSvg(nut,after):'<text x="150" y="80" text-anchor="middle" font-size="16" fill="#889" font-weight="700">예측하고 확인하면 보여요</text>';
+  $('jAfterH').textContent=show?'소화된 뒤':'소화된 뒤 (?)';
+  const pr=passRatio(nut,show?after:before);$('jPbar').style.width=Math.max(pr,pr?pr:0)+'%';$('jPbar').textContent=pr+'%';
+  const ask=$('jAsk'),msg=$('jMsg');ask.innerHTML='';
+  if(asks&&!J.conf){
+    ask.innerHTML=`<p><b>🤔 ${STG[s]}에서 ${NS[nut].name}에 작용하는 소화효소는?</b></p><div class="chips" id="jOpts"></div><div class="btn-row"><button class="btn" id="jOk" disabled onclick="jConfirm()">확인하기</button></div>`;
+    OPTS.forEach(o=>{const b=document.createElement('button');b.className='chip'+(J.sel===o?' sel':'');b.textContent=o==='없음'?'없음 (소화 안 됨)':o;b.onclick=()=>{J.sel=o;jRender()};$('jOpts').appendChild(b)});
+    $('jOk').disabled=!J.sel;msg.style.display='none';$('jNext').style.display='none';
+  }else{
+    $('jNext').style.display='inline-block';$('jNext').textContent=s===4?'🏁 여행 끝! 다시 하기':'다음 기관으로 ▶';
+    if(!asks){msg.style.display='block';msg.className='msg';msg.innerHTML=s===1?'식도에서는 소화액이 나오지 않아 <b>소화 작용이 일어나지 않아요.</b> 음식물이 위로 내려갈 뿐이에요.':`큰창자에서는 소화 작용이 거의 일어나지 않고 <b>주로 물이 흡수</b>돼요. 남은 찌꺼기는 대변이 되어 항문으로 나가요.<br>🏁 여행 결과: ${eun(NS[nut].name)} ${({starch:'입과 작은창자에서 소화되어 포도당이',prot:'위와 작은창자에서 소화되어 아미노산이',fat:'작은창자에서 소화되어 지방산과 모노글리세라이드가'})[nut]} 되었어요. (예측 정답 ${J.score}/${J.asked})`}
+  }
+}
+function jConfirm(){
+  const nut=J.nut,s=J.st,right=NS[nut].ans[s];J.conf=true;J.asked++;const ok=J.sel===right;if(ok)J.score++;
+  jRender();const m=$('jMsg');m.style.display='block';m.className='msg '+(ok?'good':'bad');
+  m.innerHTML=(ok?'✔ <b>맞아요!</b> ':`✖ 정답은 <b>${right==='없음'?'없음(소화 안 됨)':right}</b>이에요. `)+EXPL[nut][s];
+}
+function jNext(){if(J.st>=4){J={nut:J.nut,st:0,conf:false,sel:null,score:0,asked:0}}else{J.st++;J.conf=false;J.sel=null}jRender()}
+function jReset(){J={nut:J.nut,st:0,conf:false,sel:null,score:0,asked:0};jRender()}
+function jCheckTbl(){
+  const exp={starch:['입','작은창자'],prot:['위','작은창자'],fat:['작은창자']};let ok=true;const bad=[];
+  Object.keys(exp).forEach(n=>['입','위','작은창자'].forEach(s=>{const c=document.querySelector(`#jTbl input[data-n="${n}"][data-s="${s}"]`);if(c.checked!==exp[n].includes(s)){ok=false;bad.push(NS[n].name+'-'+s)}}));
+  const m=$('jTblMsg');m.style.display='block';m.className='msg '+(ok?'good':'bad');
+  m.innerHTML=ok?'✔ <b>모두 맞아요!</b> 녹말은 입과 작은창자에서, 단백질은 위와 작은창자에서, 지방은 작은창자에서 소화돼요.':'✖ 다시 확인해 보세요: '+bad.join(', ');
+}
+/* 세 영양소 한 번에 */
+const ALL={stages:['도착했을 때','입을 지난 뒤','위를 지난 뒤','작은창자를 지난 뒤'],big:{starch:[100,50,50,0],prot:[100,100,0,0],fat:[100,100,100,0]},col:{starch:'#6741d9',prot:'#d6336c',fat:'#e8890c'}};
+function allDraw(upto){
+  $('allChart').innerHTML=ALL.stages.map((s,i)=>`<div class="sol"><b>${s}</b>`+Object.keys(NS).map(k=>`<div class="hbar"><span class="l">${NS[k].name}</span><div class="t"><div style="width:${i<=upto?ALL.big[k][i]:0}%;background:${ALL.col[k]}"></div></div><b>${i<=upto?ALL.big[k][i]+'%':'-'}</b></div>`).join('')+'</div>').join('');
+}
+let allT=null;
+function runAll(){clearInterval(allT);let i=0;allDraw(0);allT=setInterval(()=>{i++;allDraw(i);if(i>=3)clearInterval(allT)},900)}
+allDraw(0);jInit();
+
+/* ============ 가상실험 ③ 융털과 표면적 ============ */
+const WR=[];let wT=null;const WCOL=['#e8590c','#1c7ed6','#2f9e44','#9c36b5'];
+const dotPos=Array.from({length:20},(_,i)=>[18+((i*53)%324),28+((i*37)%70)]);
+function wArea(){const n=+$('foldR').value,v=$('villiC').checked;return Math.round((1+.6*n)*(v?5:1)*10)/10}
+function wCurve(x,n){return 165-(n>0?22*Math.abs(Math.sin(Math.PI*n*x/360)):0)}
+function wallUpd(){
+  const n=+$('foldR').value,v=$('villiC').checked;$('foldV').textContent=n;$('areaTxt').textContent='표면적(상댓값) '+wArea().toFixed(1);
+  let p='M0,'+wCurve(0,n);for(let x=4;x<=360;x+=4)p+=` L${x},${wCurve(x,n)}`;p+=' L360,210 L0,210 Z';
+  let s=`<rect width="360" height="210" fill="#fffbe6"/><path d="${p}" fill="#f5b7c8" stroke="#e64980" stroke-width="2"/>`;
+  if(v)for(let x=8;x<=352;x+=11){const y=wCurve(x,n);s+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${y-15}" stroke="#ff7aa2" stroke-width="5" stroke-linecap="round"/>`}
+  dotPos.forEach((d,i)=>s+=`<circle class="wd" id="wd${i}" cx="${d[0]}" cy="${d[1]}" r="4.5" fill="#4263eb" style="transition:transform .5s,opacity .5s"/>`);
+  s+=`<text x="180" y="16" text-anchor="middle" font-size="12" font-weight="800" fill="#7a5a00">작은창자 속 영양소</text><text x="180" y="200" text-anchor="middle" font-size="12" font-weight="800" fill="#7a2c4a">${v?'융털 있음':'융털 없음'} · 주름 ${n}개</text>`;
+  $('wallSvg').innerHTML=s;
+}
+function runWall(){
+  clearInterval(wT);wallUpd();const area=wArea(),n=+$('foldR').value,v=$('villiC').checked;let t=0;
+  wT=setInterval(()=>{t+=.5;const A=100*(1-Math.exp(-.02*area*t));$('absTxt').textContent=A.toFixed(0);
+    const k=Math.floor(A/100*20);for(let i=0;i<k;i++){const e=$('wd'+i);if(e){e.style.transform=`translate(0px,${120-dotPos[i][1]}px)`;e.style.opacity=.15}}
+    if(t>=10){clearInterval(wT);const fin=100*(1-Math.exp(-.02*area*10));
+      const curve=[];for(let q=0;q<=10;q+=.5)curve.push([q,100*(1-Math.exp(-.02*area*q))]);
+      if(WR.length>=4)WR.shift();WR.push({lab:`주름 ${n}개 · 융털 ${v?'있음':'없음'}`,area,fin,curve});wallTbl()}},150);
+}
+function clearWall(){WR.length=0;clearInterval(wT);$('absTxt').textContent='0';wallUpd();wallTbl()}
+function wallTbl(){
+  let g='<line x1="40" y1="170" x2="340" y2="170" stroke="#889"/><line x1="40" y1="20" x2="40" y2="170" stroke="#889"/>';
+  [0,5,10].forEach(t=>g+=`<text x="${40+t*30}" y="188" text-anchor="middle" font-size="11" fill="#55656b">${t}초</text>`);
+  [0,50,100].forEach(s=>g+=`<text x="34" y="${170-s*1.5+4}" text-anchor="end" font-size="11" fill="#55656b">${s}%</text>`);
+  WR.forEach((r,i)=>{g+=`<polyline fill="none" stroke="${WCOL[i]}" stroke-width="3" points="${r.curve.map(p=>(40+p[0]*30)+','+(170-p[1]*1.5)).join(' ')}"/><text x="338" y="${170-r.fin*1.5-4}" text-anchor="end" font-size="11" font-weight="800" fill="${WCOL[i]}">${i+1}</text>`});
+  g+='<text x="190" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="#095c6b">흡수된 영양소(%) - 시간(초)</text>';
+  $('wallGraph').innerHTML=g;
+  $('wallTbl').innerHTML='<tr><th>번호</th><th>조건</th><th>표면적(상댓값)</th><th>10초 뒤 흡수량(%)</th></tr>'+(WR.length?WR.map((r,i)=>`<tr><td><b style="color:${WCOL[i]}">${i+1}</b></td><td>${r.lab}</td><td>${r.area.toFixed(1)}</td><td>${r.fin.toFixed(0)}</td></tr>`).join(''):'<tr><td colspan="4">아직 기록이 없어요. 조건을 바꿔 흡수를 시작해 보세요.</td></tr>');
+  if(WR.length>=2){const mx=WR.reduce((a,b)=>b.fin>a.fin?b:a);$('wallMsg').innerHTML=`흡수된 양: <b id="absTxt">${$('absTxt').textContent}</b> % · 표면적이 넓을수록 영양소가 더 빨리, 더 많이 흡수돼요! (가장 많이 흡수된 조건: ${mx.lab})`}
+}
+wallUpd();wallTbl();
+/* 거름종이 */
+const PREC=[];
+function paperUpd(){
+  const n=+$('pleatR').value;$('pleatV').textContent=n;let s='<svg viewBox="0 0 120 100" style="width:150px;height:125px">';
+  if(n===0)s+='<circle cx="60" cy="50" r="38" fill="#fdf1d9" stroke="#b08968" stroke-width="3"/>';
+  else{const m=8+4*n,ri=Math.max(14,38-4-3*n);let p='';for(let i=0;i<m*2;i++){const r=i%2?ri:38,a=Math.PI*i/m;p+=(i?' ':'')+(60+r*Math.cos(a)).toFixed(1)+','+(50+r*Math.sin(a)).toFixed(1)}s+=`<polygon points="${p}" fill="#fdf1d9" stroke="#b08968" stroke-width="2.5" stroke-linejoin="round"/>`}
+  s+='</svg><div style="font-size:14px;color:var(--text-light)">위에서 본 거름종이 (표면적 상댓값 '+(1+.4*n).toFixed(1)+')</div>';$('paperVis').innerHTML=s;
+}
+function dipPaper(){
+  const n=+$('pleatR').value,area=1+.4*n,g=Math.round(4*area*10)/10;
+  const ex=PREC.find(r=>r.n===n);if(ex)ex.g=g;else PREC.push({n,area,g});PREC.sort((a,b)=>a.n-b.n);
+  $('paperMsg').innerHTML=`${n===0?'접지 않은':'병풍처럼 '+n+'번 접은'} 거름종이가 물을 <b>${g.toFixed(1)} g</b> 흡수했어요.`+(PREC.length>1?' 접은 횟수가 많을수록(표면적이 넓을수록) 물을 더 많이 흡수해요!':'');
+  $('paperTbl').innerHTML='<tr><th>접은 횟수</th><th>표면적(상댓값)</th><th>흡수한 물(g)</th></tr>'+PREC.map(r=>`<tr><td>${r.n}번</td><td>${r.area.toFixed(1)}</td><td>${r.g.toFixed(1)}</td></tr>`).join('');
+}
+paperUpd();
+
+/* ============ 천연 소화제 식단 ============ */
+const NN={starch:'녹말',prot:'단백질',fat:'지방'};
+const DISH=[['noodle','🍜','국수','starch'],['bread','🍞','토스트·시리얼','starch'],['fried','🍳','닭고기 볶음밥','prot'],['pork','🥩','돼지고기 수육','prot'],['bacon','🥓','베이컨구이','fat'],['oily','🍤','기름진 튀김','fat']];
+const HELP=[['무','🥬','starch','아밀레이스가 들어 있어 면 종류의 음식에 곁들였어요.'],['파인애플','🍍','prot','단백질을 분해하는 효소가 들어 있어요.'],['바나나','🍌','starch','탄수화물을 분해하는 효소가 들어 있어요.'],['아보카도','🥑','fat','지방을 분해하는 효소가 들어 있어요.'],['키위','🥝','prot','단백질을 분해하는 효소가 들어 있어요.'],['생강','🌱','prot','단백질을 분해하는 효소가 들어 있어요.'],['꿀','🍯','starch','탄수화물 분해 효소가 들어 있어요.']];
+const DD=lsGet('vlab-digest-diet',{});let dSel=null;
+function dietRender(){
+  $('dishGrid').innerHTML=DISH.map(d=>`<button class="dish ${dSel===d[0]?'sel':''} ${DD[d[0]]?'ok':''}" data-d="${d[0]}"><span>${d[1]}</span>${d[2]}<small>${DD[d[0]]?'+ '+DD[d[0]]+' ✔':'주 영양소: '+NN[d[3]]}</small></button>`).join('');
+  $('helpGrid').innerHTML=HELP.map((h,i)=>`<button class="dish" data-h="${i}"><span>${h[1]}</span>${h[0]}<small>소화를 돕는 식품</small></button>`).join('');
+  document.querySelectorAll('#dishGrid .dish').forEach(b=>b.onclick=()=>{dSel=b.dataset.d;dietRender();const d=DISH.find(x=>x[0]===dSel);$('dietMsg').className='msg';$('dietMsg').innerHTML=`<b>${d[2]}</b>에는 주로 <b>${iga(NN[d[3]])}</b> 들어 있어요. 소화를 도울 식품을 골라 보세요.`});
+  document.querySelectorAll('#helpGrid .dish').forEach(b=>b.onclick=()=>{
+    if(!dSel){$('dietMsg').className='msg bad';$('dietMsg').textContent='먼저 위에서 음식을 골라 주세요.';return}
+    const d=DISH.find(x=>x[0]===dSel),h=HELP[+b.dataset.h];const m=$('dietMsg');
+    if(h[2]===d[3]){DD[dSel]=h[0];lsSet('vlab-digest-diet',DD);m.className='msg good';m.innerHTML=`✔ <b>${h[0]}</b>: ${h[3]} 그래서 ${NN[d[3]]}${hasB(NN[d[3]])?'이':'가'} 많은 ${d[2]}의 소화를 도와요.`;dietRender()}
+    else{m.className='msg bad';m.innerHTML=`✖ ${eun(h[0])} <b>${NN[h[2]]}</b>의 소화를 돕는 식품이에요. ${d[2]}에는 주로 ${iga(NN[d[3]])} 들어 있어서 다른 식품이 더 알맞아요.`}});
+  $('dietDone').style.display=DISH.every(d=>DD[d[0]])?'block':'none';
+}
+dietRender();
+
+/* ============ 스티커 ============ */
+const CN=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+const BD=[
+ {id:'b1',tab:'판1 이름표',title:'판 1. 소화계 이름 붙이기',desc:'그림의 점선 칸에 알맞은 기관 이름 스티커를 붙이세요. (기관이 아닌 스티커가 1장 섞여 있어요.)',
+  slots:ORGANS.map(o=>({id:o.id,ans:o.name,hints:o.hints})),
+  stickers:ORGANS.map(o=>({id:'s_'+o.id,label:o.name,k:'o'})).concat([{id:'s_kid',label:'콩팥',k:'o'}]),
+  sum:'소화계 = 소화관(입·식도·위·작은창자·큰창자·항문) + 침샘·간·쓸개·이자',build:()=>{const h=document.createElement('div');h.className='dsbox';h.id='dsSticker';$('stkBoard').appendChild(h);buildDS(h,'sticker')}},
+ {id:'b2',tab:'판2 순서',title:'판 2. 음식물이 지나가는 길',desc:'음식물이 지나가는 순서대로 ①~⑥ 칸에 붙이세요. (음식물이 지나가지 않는 기관 스티커가 섞여 있어요.)',
+  slots:[['입','음식물이 가장 먼저 들어오는 곳이에요','이로 부수고 침과 섞어요'],['식도','입과 위를 잇는 관이에요','음식물을 위로 내려보내요'],['위','주머니 모양이에요','펩신이 든 위액이 나와요'],['작은창자','길고 가는 관이에요','소화가 모두 일어나고 영양소를 흡수해요'],['큰창자','작은창자보다 굵어요','남은 찌꺼기에서 물을 흡수해요'],['항문','소화관의 맨 끝이에요','찌꺼기를 몸 밖으로 내보내요']].map((a,i)=>({id:'s'+i,ans:a[0],hints:[a[1],a[2]]})),
+  stickers:['입','식도','위','작은창자','큰창자','항문','간','쓸개','이자'].map((l,i)=>({id:'t'+i,label:l,k:'o'})),
+  sum:'음식물은 소화관(입→식도→위→작은창자→큰창자→항문)만 지나가요. 간·쓸개·이자는 소화액을 만들거나 저장·분비할 뿐 음식물이 지나가지 않아요.',
+  build:()=>{const h=document.createElement('div');h.className='flowrow';h.innerHTML=[0,1,2,3,4,5].map(i=>`<div class="slot" id="slot-b2-s${i}"></div>`+(i<5?'<span class="ar">➜</span>':'')).join('');$('stkBoard').appendChild(h)}},
+ {id:'b3',tab:'판3 정리표',title:'판 3. 영양소의 소화 정리표',desc:'녹말·단백질·지방이 각각 어떤 소화효소로, 어느 기관에서 소화되고, 최종적으로 무엇이 되는지 표를 채우세요. (섞여 있는 스티커 3장은 알맞은 칸이 없어요.)',
+  slots:[['a1','아밀레이스','침과 이자액에 들어 있어요','녹말에 작용하는 소화효소예요'],['a2','입·작은창자','침이 나오는 곳과 이자액이 나오는 곳이에요','위에서는 소화되지 않아요'],['a3','포도당','엿당은 작은창자에서 더 분해돼요','최종적으로 가장 작은 단위가 돼요'],
+         ['b1','펩신·트립신','위액과 이자액에 들어 있어요','단백질에 작용해요'],['b2','위·작은창자','위액에 펩신이 있어요','이자액에 트립신이 있어요'],['b3','아미노산','단백질이 최종적으로 분해된 산물이에요','가장 작은 단위예요'],
+         ['c1','라이페이스','이자액에 들어 있어요','지방에 작용해요'],['c2','작은창자','입, 위에는 지방을 분해하는 효소가 없어요','이자액이 나오는 곳이에요'],['c3','지방산·모노글리세라이드','지방이 분해된 산물이에요','두 가지 물질이에요']].map(a=>({id:a[0],ans:a[1],hints:[a[2],a[3]]})),
+  stickers:[['아밀레이스','e'],['펩신·트립신','e'],['라이페이스','e'],['입·작은창자','o'],['위·작은창자','o'],['작은창자','o'],['포도당','p'],['아미노산','p'],['지방산·모노글리세라이드','p'],['엿당','p'],['쓸개즙','e'],['염산','e']].map((a,i)=>({id:'u'+i,label:a[0],k:a[1]})),
+  sum:'큰 영양소 → (소화효소) → 작은 영양소 → 작은창자 융털에서 흡수',
+  build:()=>{const rows=[['🍚 녹말','n-starch','a'],['🥚 단백질','n-prot','b'],['🧈 지방','n-fat','c']];const h=document.createElement('div');h.className='tblwrap sboard3';
+    h.innerHTML='<table><tr><th>영양소</th><th>소화효소</th><th>소화되는 기관</th><th>최종 분해 산물</th></tr>'+rows.map(r=>`<tr><th class="${r[1]}">${r[0]}</th>`+[1,2,3].map(c=>`<td><div class="slot" id="slot-b3-${r[2]}${c}"></div></td>`).join('')+'</tr>').join('')+'</table>';$('stkBoard').appendChild(h)}}];
+const SK='vlab-sticker-digest';
+const STK=Object.assign({placed:{b1:{},b2:{},b3:{}},tries:{b1:0,b2:0,b3:0},done:{b1:false,b2:false,b3:false},cur:0},lsGet(SK,{}));
+let picked=null,hintLv={};
+function saveStk(){lsSet(SK,STK)}
+function B(){return BD[STK.cur]}
+function slotEl(sl){return $('slot-'+B().id+'-'+sl.id)}
+function buildBoard(){
+  $('stkBoard').innerHTML='';B().build();picked=null;hintLv={};
+  $('stkRound').innerHTML='';
+  BD.forEach((b,i)=>{const bt=document.createElement('button');const unlocked=i===0||STK.done[BD[i-1].id];
+    bt.className='tab'+(i===STK.cur?' active':'');bt.textContent=(STK.done[b.id]?'✔ ':unlocked?'':'🔒 ')+b.tab;bt.disabled=!unlocked;bt.onclick=()=>{STK.cur=i;saveStk();buildBoard()};$('stkRound').appendChild(bt)});
+  $('stkTitle').textContent=B().title;$('stkDesc').textContent=B().desc;renderStickers();
+}
+function renderStickers(){
+  const b=B(),placed=STK.placed[b.id],done=STK.done[b.id],used=new Set(Object.values(placed)),tray=$('stkTray');tray.innerHTML='';
+  b.stickers.filter(s=>!used.has(s.id)).forEach((s,i)=>{const e=document.createElement('button');
+    e.className='sticker '+s.k+(picked===s.id?' picked':'');e.style.setProperty('--tilt',((i%5)-2)*1.4+'deg');e.textContent=s.label;
+    e.onclick=()=>{if(done)return;picked=picked===s.id?null:s.id;renderStickers()};tray.appendChild(e)});
+  if(!tray.children.length)tray.innerHTML='<span style="color:#789">보관함이 비었어요</span>';
+  let hints=[];
+  b.slots.forEach((sl,idx)=>{const el=slotEl(sl);el.classList.toggle('ready',!!picked&&!done);
+    const s=b.stickers.find(x=>x.id===placed[sl.id]);
+    el.innerHTML=s?'':`<span class="hint">${CN[idx]}</span>`;
+    if(s){const e=document.createElement('button');e.className='sticker '+s.k;e.textContent=s.label;
+      e.onclick=ev=>{ev.stopPropagation();if(done)return;delete placed[sl.id];el.classList.remove('ok','no');saveStk();renderStickers()};el.appendChild(e)}
+    el.onclick=()=>{if(!picked||done)return;placed[sl.id]=picked;picked=null;el.classList.remove('ok','no');saveStk();renderStickers()};
+    if(done)el.classList.add('ok');
+    if(!s&&hintLv[sl.id])hints.push(`${CN[idx]} ${sl.hints[hintLv[sl.id]-1]}`)});
+  $('stkCount').textContent=Object.keys(placed).length+' / '+b.slots.length;$('stkTry').textContent=STK.tries[b.id];
+  $('stamp').classList.toggle('show',done);$('stkDone').style.display=done?'block':'none';$('stkSum').textContent='한 줄 정리: '+b.sum;
+  $('stkNextBoard').style.display=done&&STK.cur<2?'inline-block':'none';$('stkNext').style.display=done&&STK.cur===2?'inline-block':'none';
+  let hb=$('stkHint');if(!hb){hb=document.createElement('div');hb.id='stkHint';hb.className='msg';$('stkBoard').after(hb)}
+  hb.style.display=hints.length?'block':'none';hb.innerHTML='💡 <b>힌트</b><br>'+hints.join('<br>');
+}
+function checkStickers(){
+  const b=B(),placed=STK.placed[b.id];if(STK.done[b.id])return;STK.tries[b.id]++;let allOk=true;
+  b.slots.forEach(sl=>{const el=slotEl(sl),s=b.stickers.find(x=>x.id===placed[sl.id]);
+    const ok=!!s&&s.label===sl.ans;el.classList.toggle('ok',ok);el.classList.toggle('no',!!s&&!ok);
+    if(!ok){allOk=false;if(s)hintLv[sl.id]=Math.min((hintLv[sl.id]||0)+1,2);
+      if(s)setTimeout(()=>{delete placed[sl.id];el.classList.remove('no');saveStk();renderStickers()},800)}});
+  if(allOk){STK.done[b.id]=true;saveStk();buildBoard()}
+  else{saveStk();$('stkTry').textContent=STK.tries[b.id];setTimeout(renderStickers,850)}
+}
+function resetStickers(){const b=B();STK.placed[b.id]={};STK.tries[b.id]=0;STK.done[b.id]=false;for(let i=STK.cur+1;i<3;i++){STK.done[BD[i].id]=false;STK.placed[BD[i].id]={}}saveStk();buildBoard()}
+function nextBoard(){STK.cur=Math.min(2,STK.cur+1);saveStk();buildBoard();window.scrollTo(0,0)}
+buildBoard();
+
+/* ============ 실생활 ============ */
+const LIFE=[
+ ['🍚 밥을 오래 씹으면 단맛이 나는 까닭','밥(녹말)을 오래 씹으면 침 속 아밀레이스가 녹말을 엿당으로 분해해서 단맛이 나요. 침의 소화 작용 탐구에서 본 바로 그 반응이에요.','침의 아밀레이스: 녹말 → 엿당'],
+ ['💊 체했을 때 먹는 소화제','소화제에는 영양소의 분해를 도와주는 소화효소가 들어 있는 것이 많아요. 우리 몸의 소화효소가 일하는 것을 돕는 거예요.','소화효소는 분해를 촉진'],
+ ['🍍 고기와 파인애플을 함께 먹는 까닭','파인애플에는 단백질을 분해하는 효소가 들어 있어서 닭고기·돼지고기 볶음밥에 넣으면 단백질의 소화를 촉진할 수 있어요.','단백질 분해 효소'],
+ ['🍜 국수에 무를 곁들이는 지혜','무에는 아밀레이스가 들어 있어서 우리 조상들은 면 같은 녹말 음식에 무를 곁들여 먹었어요.','아밀레이스 → 녹말'],
+ ['🍟 기름진 음식을 먹었을 때','간에서 만들어 쓸개에 저장해 둔 쓸개즙이 작은창자로 나와 지방의 소화를 도와요. 쓸개즙에는 소화효소가 없어요.','쓸개즙: 지방의 소화를 도움'],
+ ['🦠 상한 음식을 먹었을 때 위의 역할','위액에는 강한 산성의 염산이 있어요. 염산은 펩신의 작용을 돕고 음식물 속 세균을 죽이는 작용을 해요.','위액: 펩신 + 염산'],
+ ['🚽 큰창자가 하는 일','작은창자에서 흡수되고 남은 찌꺼기는 큰창자로 가요. 큰창자에서 물이 흡수된 뒤 대변이 되어 항문으로 나가요.','큰창자: 주로 물 흡수'],
+ ['🧽 표면적을 넓혀 효율을 높이는 구조','작은창자의 주름과 융털, 식물의 뿌리털, 물고기의 아가미, 극세사 타월, 칫솔은 모두 표면적을 넓혀서 일을 더 잘하게 해요.','주름과 융털 → 효율적인 흡수']];
+$('lifeGrid').innerHTML=LIFE.map(x=>`<div class="card"><h3>${x[0]}</h3><p>${x[1]}</p><span class="link">🔗 이 단원의 개념: ${x[2]}</span></div>`).join('');
+
+/* ============ 퀴즈 ============ */
+const QUIZ=[
+ {q:'다음 표는 영양소가 세포막을 통과할 수 있는지를 나타낸 것이다. 이 표로 알 수 있는 <b>소화가 필요한 까닭</b>은?<div class="tblwrap"><table><tr><th>영양소</th><th>녹말</th><th>단백질</th><th>지방</th><th>포도당</th><th>아미노산</th></tr><tr><td>세포막 통과</td><td>✖</td><td>✖</td><td>✖</td><td>○</td><td>○</td></tr></table></div>',o:['크기가 큰 영양소를 세포막을 통과할 수 있는 작은 크기로 분해해야 하기 때문','음식물을 입안에서 부수어야 하기 때문','영양소의 맛을 느끼기 위해서','음식물 속 세균을 모두 없애야 하기 때문'],a:0,e:'녹말·단백질·지방은 크기가 커서 세포막을 통과하지 못해요. 소화는 이를 통과할 수 있는 작은 영양소로 분해하는 과정이에요.'},
+ {q:'소화관에 <b>속하지 않는</b> 기관은?',o:['위','식도','이자','큰창자'],a:2,e:'소화관은 입, 식도, 위, 작은창자, 큰창자, 항문이에요. 이자는 이자액을 만들어 작은창자로 보내는, 소화에 관여하는 기관이에요.'},
+ {q:'음식물이 지나가는 순서를 옳게 나타낸 것은?',o:['입 → 식도 → 위 → 작은창자 → 큰창자 → 항문','입 → 식도 → 위 → 간 → 작은창자 → 항문','입 → 위 → 식도 → 작은창자 → 큰창자 → 항문','입 → 식도 → 이자 → 위 → 작은창자 → 항문'],a:0,e:'음식물은 소화관만 지나가요. 간·쓸개·이자로는 음식물이 지나가지 않아요.'},
+ {q:'침의 소화 작용 탐구 결과이다. 이 결과로 알 수 있는 침의 작용은?<div class="tblwrap"><table><tr><th>구분</th><th>(가) 녹말 + 증류수</th><th>(나) 녹말 + 침 용액</th></tr><tr><td>아이오딘 반응</td><td>청람색</td><td>변화 없음(황갈색)</td></tr><tr><td>베네딕트 반응(가열)</td><td>변화 없음(파란색)</td><td>황적색</td></tr></table></div>',o:['녹말을 당분(엿당)으로 분해한다','단백질을 아미노산으로 분해한다','지방을 지방산으로 분해한다','당분(엿당)을 녹말로 합성한다'],a:0,e:'(나)에서 녹말은 검출되지 않고 당분(엿당)이 검출되었으므로, 침은 녹말을 당분(엿당)으로 분해해요.'},
+ {q:'침의 소화 작용 탐구에서 (가)에 증류수를 넣은 까닭과 시험관을 35~40 ℃의 물에 담가 둔 까닭을 옳게 짝지은 것은?',o:['침 유무에 따른 결과를 비교하기 위해(대조군) / 체온과 비슷한 온도를 유지하기 위해','녹말을 분해하기 위해 / 용액을 끓이기 위해','침을 없애기 위해 / 베네딕트 반응을 빨리 하기 위해','시험관을 씻기 위해 / 용액을 얼리기 위해'],a:0,e:'(가)는 침이 없는 대조군이고, 35~40 ℃는 체온과 비슷한 온도예요.'},
+ {q:'소화효소와 작용하는 영양소를 옳게 짝지은 것은?',o:['라이페이스 - 지방','아밀레이스 - 단백질','펩신 - 녹말','트립신 - 지방'],a:0,e:'아밀레이스는 녹말, 펩신과 트립신은 단백질, 라이페이스는 지방에 작용해요. 소화효소는 특정 영양소에만 작용해요.'},
+ {q:'쓸개즙에 대한 설명으로 옳은 것은?',o:['간에서 만들어져 쓸개에 저장되며, 소화효소는 없지만 지방의 소화를 돕는다','쓸개에서 만들어지고 지방을 분해하는 효소가 들어 있다','이자에서 만들어져 단백질을 분해한다','위에서 분비되어 세균을 죽인다'],a:0,e:'쓸개즙은 쓸개가 아니라 간에서 만들어져요. 소화효소는 없지만 지방의 소화가 잘 일어나도록 도와요.'},
+ {q:'녹말, 단백질, 지방이 작은창자에서 최종 분해된 산물을 옳게 짝지은 것은?',o:['포도당 - 아미노산 - 지방산과 모노글리세라이드','엿당 - 아미노산 - 지방산','포도당 - 폴리펩타이드 - 포도당','아미노산 - 포도당 - 모노글리세라이드'],a:0,e:'녹말은 포도당(엿당은 중간 산물), 단백질은 아미노산, 지방은 지방산과 모노글리세라이드로 최종 분해돼요.'},
+ {q:'지름과 높이가 같은 거름종이로 실험한 결과이다. 이 결과와 가장 관련이 깊은 <b>작은창자의 특징</b>은?<div class="tblwrap"><table><tr><th>거름종이</th><th>A (접지 않음)</th><th>B (병풍처럼 접음)</th></tr><tr><td>흡수한 물의 양</td><td>4 g</td><td>10 g</td></tr></table></div>',o:['안쪽 벽의 주름과 융털로 표면적이 넓어 영양소를 효율적으로 흡수한다','융털에서 소화효소가 분비된다','큰창자와 이어져 있어 찌꺼기가 쌓인다','쓸개즙이 만들어지는 곳이다'],a:0,e:'접은 거름종이처럼 작은창자의 주름과 융털은 표면적을 넓혀 영양소를 효율적으로 흡수하게 해요.'},
+ {q:'쓸개즙의 분비가 부족할 때 가장 영향을 받을 것으로 예상되는 영양소는?',o:['지방','녹말','포도당','아미노산'],a:0,e:'쓸개즙은 지방의 소화가 잘 일어나도록 도와요. 쓸개즙이 부족하면 지방의 소화가 가장 영향을 받아요.'}];
+let order=[],qi=0,score=0,wrong=[],startT=0,ans=false,curQ=null,pool=null;
+function startQuiz(list){pool=Array.isArray(list)?list:QUIZ.map((_,i)=>i);order=sh(pool);qi=0;score=0;wrong=[];startT=Date.now();goTo(5);renderQ()}
+function renderQ(){
+  ans=false;const item=QUIZ[order[qi]];const opts=sh(item.o.map((t,i)=>({t,ok:i===item.a})));curQ={item,opts};
+  $('qnum').textContent=`문제 ${qi+1} / ${order.length}`;$('qtext').innerHTML=item.q;$('qbar').style.width=(qi/order.length*100)+'%';
+  const w=$('qchoices');w.innerHTML='';opts.forEach((op,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=`${i+1}. ${op.t}`;b.onclick=()=>pick(i);w.appendChild(b)});
+  $('qexp').className='expl';$('qnext').style.display='none';
+}
+function pick(i){
+  if(ans)return;ans=true;const {item,opts}=curQ;
+  document.querySelectorAll('#qchoices .choice').forEach((b,k)=>{if(opts[k].ok){b.classList.add('correct');b.textContent='✔ '+b.textContent}else if(k===i){b.classList.add('wrong');b.textContent='✖ '+b.textContent}});
+  if(opts[i].ok)score++;else wrong.push(order[qi]);
+  $('qexp').innerHTML=(opts[i].ok?'<b>정답!</b> ':'<b>아쉬워요.</b> ')+item.e;$('qexp').classList.add('show');
+  $('qnext').style.display='inline-block';$('qnext').textContent=qi===order.length-1?'결과 보기 ▶':'다음 문제 ▶';
+}
+function nextQ(){qi++;if(qi>=order.length)showRes();else renderQ()}
+function showRes(){
+  $('qbar').style.width='100%';$('fscore').textContent=score;$('ftotal').textContent=order.length;
+  const sec=Math.round((Date.now()-startT)/1000);$('ftime').textContent=`걸린 시간: ${Math.floor(sec/60)}분 ${sec%60}초`;
+  const r=score/order.length;$('fmsg').textContent=r>=.8?'소화계의 구조와 기능을 아주 잘 이해했어요!':r>=.5?'조금만 더 복습하면 완벽해요.':'개념과 가상실험을 다시 살펴볼까요?';
+  $('fwrong').innerHTML=wrong.length?'<h3>다시 확인할 문제</h3>'+wrong.map(i=>`<div class="mini" style="margin-bottom:8px"><p style="color:var(--text)">${QUIZ[i].q.split('<div')[0]}</p><p><b>정답:</b> ${QUIZ[i].o[QUIZ[i].a]}</p></div>`).join(''):'<p style="text-align:center">모두 맞혔어요! 👏</p>';
+  $('retryBtn').style.display=wrong.length?'inline-block':'none';goTo(6);
+}
+function retryWrong(){if(wrong.length)startQuiz(wrong.slice())}
+</script>
+</body>
+</html>
